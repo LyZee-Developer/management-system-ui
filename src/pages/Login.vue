@@ -1,106 +1,91 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="w-[380px] bg-white rounded-2xl shadow-xl p-8 text-center">
-
-      <!-- Logo -->
-      <div class="flex items-center justify-center gap-2 mb-3">
-        <div class="w-6 h-3 bg-indigo-500 rounded-t-full"></div>
-        <span class="font-semibold text-lg">Aura</span>
-      </div>
-
-      <!-- Title -->
-      <h1 class="text-2xl font-bold mb-1">Welcome back</h1>
-      <p class="text-gray-500 text-sm mb-6">
-        Please enter your details to sign in
-      </p>
-
-      <!-- Social -->
-      <div class="flex justify-center gap-3 mb-6">
-        <button class="w-11 h-11 rounded-full border flex items-center justify-center hover:bg-gray-100">G</button>
-        <button class="w-11 h-11 rounded-full border flex items-center justify-center hover:bg-gray-100"></button>
-        <button class="w-11 h-11 rounded-full border flex items-center justify-center hover:bg-gray-100">X</button>
-      </div>
-
-      <!-- Divider -->
-      <div class="flex items-center mb-6">
-        <div class="flex-1 h-px bg-gray-200"></div>
-        <span class="px-3 text-xs text-gray-400">OR</span>
-        <div class="flex-1 h-px bg-gray-200"></div>
-      </div>
-
-      <!-- Form -->
-      <div class="text-left space-y-4">
-        <div>
-          <label class="text-sm">Your Email Address</label>
-          <input
-            type="email"
-            v-model="email"
-            placeholder="Your Email Address"
-            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
+    <div
+        class="w-full px-3 flex justify-center items-center h-screen bg-center bg-cover bg-[url('../assets/background/background.avif')]">\
+        <Toast />
+        <div
+            class="max-w-87.5 gap-y-5 w-full px-10 flex max-[400px]:px-7 transition-all py-10 flex-col items-center bg-white/30 backdrop-blur-md  rounded-3xl">
+            <div class="flex items-center flex-col gap-y-2">
+                <div class="w-17 h-17 bg-white rounded-full flex justify-center items-center">
+                    <i class="pi pi-user" style="font-size: 2rem"></i>
+                </div>
+                <h5 class="text-xl font-medium">Customer Login</h5>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <FloatLabel>
+                    <label for="username">Username</label>
+                    <InputText name="username" @update:modelValue="onInput" v-model="data.username" type="text" fluid />
+                </FloatLabel>
+                <span v-if="data.username.trim() == '' && !isFirstLogin" class="text-red-700 text-[13px]">Username is required</span>
+                <span v-if="isUsernameNumber" class="text-red-700 text-[13px]">Username get letter only</span>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <FloatLabel>
+                    <Password  v-model="data.password" placeholder="Password" toggleMask fluid />
+                </FloatLabel>
+                <span v-if="data.password.trim() == '' && !isFirstLogin" class="text-red-700 text-[13px]">Password is required</span>
+            </div>
+            <div class="flex flex-col gap-1 w-full" v-if="isCreateAccount">
+                <FloatLabel>
+                    <Password  v-model="data.confirmPassword" placeholder="Confirm Password" toggleMask fluid />
+                </FloatLabel>
+                <span v-if="data.confirmPassword.trim() == '' && !isFirstLogin" class="text-red-700 text-[13px]">Confirm Password is required</span>
+            </div>
+            <p class="cursor-pointer" @click="isCreateAccount = true" v-if="!isCreateAccount">Register or create account</p>
+            <p class="cursor-pointer" @click="isCreateAccount = false" v-else>Back to access system</p>
+            <Button label="Login" class="w-full" severity="info" @click="onClickSubmit" />
         </div>
-
-        <div>
-          <label class="text-sm">Password</label>
-          <div class="relative">
-            <input
-              :type="showPassword ? 'text' : 'password'"
-              v-model="password"
-              placeholder="********"
-              class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-            <span
-              class="absolute right-3 top-3 cursor-pointer text-gray-400"
-              @click="showPassword = !showPassword"
-            >
-              👁
-            </span>
-          </div>
-        </div>
-
-        <!-- Options -->
-        <div class="flex justify-between items-center text-sm">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="remember" />
-            Remember me
-          </label>
-          <a href="#" class="text-gray-500 hover:underline">
-            Forgot password?
-          </a>
-        </div>
-
-        <!-- Button -->
-        <button
-          @click="handleLogin"
-          class="w-full py-2 rounded-lg bg-gradient-to-r from-black to-gray-700 text-white hover:opacity-90"
-        >
-          Sign in
-        </button>
-      </div>
-
-      <!-- Signup -->
-      <p class="mt-6 text-sm text-gray-500">
-        Don’t have an account?
-        <a href="#" class="font-medium text-black hover:underline">Sign up</a>
-      </p>
-
     </div>
-  </div>
 </template>
-
 <script setup lang="ts">
-import { ref } from 'vue'
+import { Button, FloatLabel, InputText, Password, Toast, useToast } from 'primevue';
+import { ref, watch } from 'vue';
+const toast = useToast();
+const isCreateAccount = ref<boolean>(false);
+const isUsernameNumber = ref<boolean>(false);
+const isFirstLogin = ref<boolean>(true);
+watch(isCreateAccount,()=>{
+    isFirstLogin.value = true;
+    data.value.username = "";
+    data.value.confirmPassword = "";
+    data.value.password = "";
+})
 
-const email = ref<string>('')
-const password = ref<string>('')
-const remember = ref<boolean>(false)
-const showPassword = ref<boolean>(false)
 
-const handleLogin = () => {
-  console.log({
-    email: email.value,
-    password: password.value,
-    remember: remember.value
-  })
+const data = ref<{
+    username:string,
+    password:string,
+    confirmPassword:string,
+}>({
+    username:"",
+    password:"",
+    confirmPassword:"",
+})
+
+const show = (message:string="",type:string) => {
+    toast.add({ 
+        summary: 'Check here',
+        severity: type,
+        detail: message, 
+        life: 3000 
+    });
+};
+
+const onInput = (e: any) => {
+    if(e.trim() == "") {
+        isUsernameNumber.value = false;
+        return;
+    }
+    const isValid = /^[a-zA-Z]+$/.test(e)
+    console.log(isValid) // false
+    isUsernameNumber.value = !isValid;
 }
+
+const onClickSubmit=()=>{
+    isFirstLogin.value = false;
+    if(data.value.confirmPassword.trim() == "" || data.value.password.trim() == "" ||  data.value.username.trim() == "" ) return;
+    if(data.value.password !== data.value.confirmPassword && isCreateAccount.value){
+        show("Your passsword not match each other!😒","error")
+    }
+}
+
 </script>

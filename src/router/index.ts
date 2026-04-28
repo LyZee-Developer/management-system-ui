@@ -1,20 +1,26 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 // pages
-import Login from "../pages/login.vue";
 import PageNotFound from "../pages/PageNotFound.vue";
-import OurSystem from "../pages/OurSystem.vue";
+import WebSocker from "../pages/WebSocker.vue";
+import Login from "../pages/Login.vue";
+import Home from "../pages/Home.vue";
 
 const routes: Array<any> = [
   {
-    path: "/",
+    path: "/login",
     name: "login",
     component: Login,
   },
   {
-    path: "/our",
-    name: "our",
-    component: OurSystem,
+    path: "/",
+    name: "home",
+    component: Home,
+  },
+  {
+    path: "/websocket",
+    name: "websocket",
+    component: WebSocker,
   },
   {
     path: "/:pathMatch(.*)*",
