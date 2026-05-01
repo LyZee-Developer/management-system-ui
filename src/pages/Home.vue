@@ -1,8 +1,11 @@
 <template>
-    <div class="w-full px-3 flex justify-center items-center h-screen bg-center bg-cover bg-[url('../assets/background/background.avif')]">
-        
-    </div>
+    <BContainer fluid class="p-0">
+        <Header></Header>
+    </BContainer>
 </template>
 <script setup lang="ts">
+import { BContainer } from 'bootstrap-vue-next';
+import Header from '../components/Header.vue';
+
 
 </script>

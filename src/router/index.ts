@@ -5,12 +5,18 @@ import PageNotFound from "../pages/PageNotFound.vue";
 import WebSocker from "../pages/WebSocker.vue";
 import Login from "../pages/Login.vue";
 import Home from "../pages/Home.vue";
+import Header from "../components/Header.vue";
 
 const routes: Array<any> = [
   {
     path: "/login",
     name: "login",
     component: Login,
+  },
+  {
+    path: "/header",
+    name: "header",
+    component: Header,
   },
   {
     path: "/",

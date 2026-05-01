@@ -1,0 +1,8 @@
+// 1. Import Bootstrap functions first
+@import "bootstrap/scss/functions";
+
+// 2. Override the primary variable
+$primary: #6E026F; // Your custom color here
+
+// 3. Import the rest of Bootstrap
+@import "bootstrap/scss/bootstrap";
