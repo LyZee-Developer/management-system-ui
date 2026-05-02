@@ -6,6 +6,7 @@ import WebSocker from "../pages/WebSocker.vue";
 import Login from "../pages/Login.vue";
 import Home from "../pages/Home.vue";
 import Header from "../components/Header.vue";
+import Chat from "../pages/communicate/Chat.vue";
 
 const routes: Array<any> = [
   {
@@ -17,6 +18,11 @@ const routes: Array<any> = [
     path: "/header",
     name: "header",
     component: Header,
+  },
+  {
+    path: "/chat",
+    name: "chat",
+    component: Chat,
   },
   {
     path: "/",

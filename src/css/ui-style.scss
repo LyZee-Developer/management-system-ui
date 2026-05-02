@@ -38,3 +38,15 @@ $primary-end: #7b2ff7;
     transition: width 0.3s ease;
   }
 }
+
+// effect style while hover on card that has class below
+.hover-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background-color: unset;
+}
+
+.hover-card:hover {
+  transform: translateY(-4px);
+  // box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}

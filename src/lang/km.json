@@ -33,6 +33,8 @@
     "khmer": "កម្ពុជា"
   },
   "system": {
-    "search_feature_you_want": "មុខងារស្វែងរកដែលអ្នកចង់បាននៅទីនេះ..."
+    "search_feature_you_want": "មុខងារស្វែងរកដែលអ្នកចង់បាននៅទីនេះ...",
+    "conversation": "ការសន្ទនា",
+    "message": "សារ"
   }
 }

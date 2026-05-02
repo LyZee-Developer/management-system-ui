@@ -77,15 +77,6 @@ const data = ref<{
     confirmPassword: "",
 })
 
-const onInput = (e: any) => {
-    if (e.trim() == "") {
-        is_user_input_number.value = false;
-        return;
-    }
-    const isValid = /^[a-zA-Z]+$/.test(e)
-    console.log(isValid) // false
-    is_user_input_number.value = !isValid;
-}
 
 const onClickSubmit = () => {
     let confirm_password: string = data.value.confirmPassword.trim();
