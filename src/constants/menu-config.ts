@@ -42,6 +42,12 @@ export const menuConfig: MenuConfigType[] = [
         name: "calculate_budget",
         icon: "proicons:calculator",
       },
+      {
+        code: "purchase_plan",
+        url: "/purchase_plan",
+        name: "purchase_plan",
+        icon: "proicons:checkbox-list",
+      },
     ],
   },
 ];

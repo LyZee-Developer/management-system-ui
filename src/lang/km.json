@@ -2,7 +2,7 @@
   "menu": {
     "baby": "test",
     "communicate": {
-      "_": "Communicate",
+      "_": "ទំនាក់ទំនង",
       "chat": "ជជែក"
     },
     "calculate_budget": {
@@ -21,10 +21,18 @@
     },
     "budget": {
       "_": "ថវិកា",
-      "calculate_budget": "គណនាថវិកា"
+      "calculate_budget": "គណនាថវិកា",
+      "purchase_plan": "ផែនការទិញ"
     }
   },
   "header": {
-    "management_all_system": "ប្រព័ន្ធគ្រប់គ្រងទាំងអស់។"
+    "management_all_system": "ប្រព័ន្ធគ្រប់គ្រងទាំងអស់។",
+    "menu_of": "ម៉ឺនុយនៃ"
+  },
+  "transalte": {
+    "khmer": "កម្ពុជា"
+  },
+  "system": {
+    "search_feature_you_want": "មុខងារស្វែងរកដែលអ្នកចង់បាននៅទីនេះ..."
   }
 }

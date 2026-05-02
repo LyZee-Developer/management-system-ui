@@ -7,4 +7,5 @@ export const StringConstant: StringConstantType = {
   THEME: "theme",
   VUEUSE_COLOR_SCHEME: "vueuse-color-scheme",
   SEARCH: "search",
+  ZOOM: "zoom",
 };

@@ -17,6 +17,9 @@ import "vue3-toastify/dist/index.css";
 // controller langauge for our system
 import i18n from './i18n/i18n'
 
+//support font with difference language
+import './css/font-style.css'
+
 //style manage all of system
 import './css/ui-style.scss'
 

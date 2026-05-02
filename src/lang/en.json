@@ -21,10 +21,18 @@
     },
     "budget": {
       "_": "Budget",
-      "calculate_budget": "Calculate Budget"
+      "calculate_budget": "Calculate Budget",
+      "purchase_plan": "Purchase Plan"
     }
   },
   "header": {
-    "management_all_system": "Management all system"
+    "management_all_system": "Management all system",
+    "menu_of": "Menu of"
+  },
+  "transalte": {
+    "khmer": "Cambodia"
+  },
+  "system": {
+    "search_feature_you_want": "Search feature you want here ..."
   }
 }

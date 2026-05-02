@@ -4,4 +4,5 @@ export interface StringConstantType{
   THEME : string,
   VUEUSE_COLOR_SCHEME : string,
   SEARCH : string,
+  ZOOM : string,
 }

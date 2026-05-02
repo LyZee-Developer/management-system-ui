@@ -21,7 +21,6 @@
             <BCol md="3" sm="6">
                 <BCard class="rounded-4 gap-5 " :class="style.flex_center">
                     <div :class="style.flex_center">
-                        <!-- <Icon icon="proicons:bug" width="50" height="50" style="color: #ca00cc" /> -->
                         <Icon icon="proicons:alert-triangle" width="50" height="50" style="color: #ca00cc" />
                     </div>
                     <p class="m-0 pt-3">{{ search }} - {{ $t("menu.no_available") }}</p>
@@ -30,7 +29,7 @@
         </BRow>
         <BRow class="pt-4 ps-3" v-if="is_select_sub_menu">
             <div class="ps-3 fs-5">
-                Menu of {{ $t(`menu.${select_menu.name}._`) }}
+                {{ $t("header.menu_of") }} {{ $t(`menu.${select_menu.name}._`) }}
             </div>
         </BRow>
         <BRow class="d-flex pt-3 px-3" v-if="is_select_sub_menu" style="row-gap: 10px;">
@@ -55,14 +54,17 @@ import type { MenuConfigType, MenuProperties } from '../types/menu_type';
 import UIInput from './ui/UIInput.vue';
 import { StringConstant } from '../constants/string-constant';
 
-const style = StyleUtil;
-const search = ref<string>("")
 const menus = menuConfig;
+const style = StyleUtil;
+
+const search = ref<string>("")
 const dynamic_menu = ref<MenuConfigType[]>(menus);
-const is_max_than_0 = computed(() => dynamic_menu.value.length > 0);
 const select_menu = ref<MenuConfigType>({} as MenuConfigType);
 const select_sub_menu = ref<MenuProperties>({} as MenuProperties);
+
+const is_max_than_0 = computed(() => dynamic_menu.value.length > 0);
 const is_select_sub_menu = computed(() => select_menu.value && select_menu.value.code?.length > 0);
+
 const onDebounce = () => {
     dynamic_menu.value = menus.filter((menu: MenuConfigType) => menu.name.includes(search.value))
 }
@@ -74,6 +76,7 @@ const select = (menu: MenuConfigType) => {
 const selectSubMenu = (sub: MenuProperties) => {
     select_sub_menu.value = sub;
 }
+
 </script>
 <style scoped>
 .calc-height {
