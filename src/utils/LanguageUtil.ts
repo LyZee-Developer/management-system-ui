@@ -1,10 +1,10 @@
 import { useI18n } from "vue-i18n";
 
 export const LanguageUtil = () => {
-  const { locale } = useI18n<{}, "en" | "kh">();
+  const { locale } = useI18n<{}, "en" | "km">();
 
   //========= user want to use other lanauge =========
-  const setLanguage = (language: "en" | "kh") => {
+  const setLanguage = (language: "en" | "km") => {
     locale.value = language;
   };
 

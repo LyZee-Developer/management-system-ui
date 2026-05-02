@@ -17,6 +17,9 @@ import "vue3-toastify/dist/index.css";
 // controller langauge for our system
 import i18n from './i18n/i18n'
 
+//style manage all of system
+import './css/ui-style.scss'
+
 createApp(App)
   .use(router)
   .use(i18n)

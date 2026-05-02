@@ -1,0 +1,30 @@
+{
+  "menu": {
+    "baby": "test",
+    "communicate": {
+      "_": "Communicate",
+      "chat": "Chat"
+    },
+    "calculate_budget": {
+      "_": "Calculate Budget"
+    },
+    "babcalculate_budget": {
+      "tset": "test"
+    },
+    "no_available": "No available in system.",
+    "chat": {
+      "_": "Chat"
+    },
+    "security": {
+      "_": "Security",
+      "password": "Password"
+    },
+    "budget": {
+      "_": "Budget",
+      "calculate_budget": "Calculate Budget"
+    }
+  },
+  "header": {
+    "management_all_system": "Management all system"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "menu": {
+    "baby": "test",
+    "communicate": {
+      "_": "Communicate",
+      "chat": "ជជែក"
+    },
+    "calculate_budget": {
+      "_": "Calculate Budget"
+    },
+    "babcalculate_budget": {
+      "tset": "សាកល្បង"
+    },
+    "no_available": "មិនមាននៅក្នុងប្រព័ន្ធទេ។",
+    "chat": {
+      "_": "ជជែក"
+    },
+    "security": {
+      "_": "សន្តិសុខ",
+      "password": "ពាក្យសម្ងាត់"
+    },
+    "budget": {
+      "_": "ថវិកា",
+      "calculate_budget": "គណនាថវិកា"
+    }
+  },
+  "header": {
+    "management_all_system": "ប្រព័ន្ធគ្រប់គ្រងទាំងអស់។"
+  }
+}
