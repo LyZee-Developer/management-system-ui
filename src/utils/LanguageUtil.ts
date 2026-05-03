@@ -1,5 +1,5 @@
 import { useI18n } from "vue-i18n";
-import type { SupportLanguage } from "../types/langauge_type";
+import type { SupportLanguage } from "../types/langaugeType";
 
 export const LanguageUtil = () => {
   const { locale } = useI18n<{}, SupportLanguage>();

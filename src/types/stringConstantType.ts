@@ -5,4 +5,12 @@ export interface StringConstantType{
   VUEUSE_COLOR_SCHEME : string,
   SEARCH : string,
   ZOOM : string,
+  SLASH : string,
+  PROFILE : string,
+  LOG_OUT : string,
+  LOG_IN : string,
+  MAX_0 : number,
+  FEMALE : string,
+  MALE : string,
+  GENDER : string,
 }

@@ -5,40 +5,18 @@ import PageNotFound from "../pages/PageNotFound.vue";
 import WebSocker from "../pages/WebSocker.vue";
 import Login from "../pages/Login.vue";
 import Home from "../pages/Home.vue";
-import Header from "../components/Header.vue";
 import Chat from "../pages/communicate/Chat.vue";
 
 const routes: Array<any> = [
-  {
-    path: "/login",
-    name: "login",
-    component: Login,
-  },
-  {
-    path: "/header",
-    name: "header",
-    component: Header,
-  },
-  {
-    path: "/chat",
-    name: "chat",
-    component: Chat,
-  },
-  {
-    path: "/",
-    name: "home",
-    component: Home,
-  },
-  {
-    path: "/websocket",
-    name: "websocket",
-    component: WebSocker,
-  },
-  {
-    path: "/:pathMatch(.*)*",
-    name: "not-found",
-    component: PageNotFound,
-  },
+  { path: "/", name: "home", component: Home },
+  { path: "/login", name: "login", component: Login },
+  
+  //sub children of communicate
+  { path: "/chat", name: "chat", component: Chat },
+  { path: "/websocket", name: "websocket", component: WebSocker },
+  
+  // url doesn't match with url 
+  { path: "/:pathMatch(.*)*", name: "not-found", component: PageNotFound },
 ];
 
 const router = createRouter({

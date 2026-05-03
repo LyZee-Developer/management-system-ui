@@ -50,3 +50,26 @@ $primary-end: #7b2ff7;
   transform: translateY(-4px);
   // box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
+
+
+/* Vertical scrollbar width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track background */
+::-webkit-scrollbar-track {
+  background: none;
+  border-radius: 10px;
+}
+
+/* Draggable handle */
+::-webkit-scrollbar-thumb {
+  background: #6E026F;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

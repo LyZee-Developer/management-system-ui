@@ -1,17 +1,32 @@
 <template>
-    <router-view />
+    <b-container fluid class="p-0">
+        <Header v-if="isShowHeader"/>
+        <router-view />
+    </b-container>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import ThemeUtil from './utils/ThemeUtil';
 import { LanguageUtil } from './utils/LanguageUtil';
+import { BContainer } from 'bootstrap-vue-next';
+import Header from './components/Header.vue';
+import { RouteUtil } from './utils/RouteUtil';
+import { StringConstant } from './constants/stringConstant';
 const theme = ThemeUtil();
 const lang = LanguageUtil();
+const route = RouteUtil();
+
+const isShowHeader = computed(() => {
+    let paths = route.getPathList();
+    let isShow = !paths.includes(StringConstant.LOG_IN);
+    return isShow;
+});
 
 onMounted(() => {
     theme.setThemeToSystem();
     lang.setLanguage("en");
 })
+
 
 </script>

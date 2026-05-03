@@ -1,5 +1,5 @@
 import { useDark, useToggle } from "@vueuse/core";
-import { StringConstant } from "../constants/string-constant";
+import { StringConstant } from "../constants/stringConstant";
 const ThemeUtil = () => {
   const is_dark_mode = useDark();
   const toggleDark = useToggle(is_dark_mode);

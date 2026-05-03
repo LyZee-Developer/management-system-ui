@@ -1,4 +1,4 @@
-import type { LanguageType } from "../types/langauge_type";
+import type { LanguageType } from "../types/langaugeType";
 
 export const languages: LanguageType[] = [
   {

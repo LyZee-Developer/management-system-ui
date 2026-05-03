@@ -7,9 +7,9 @@
                 </BRow>
             </BCol>
         </BRow>
-        <BRow class="d-flex pt-3 px-3" v-if="is_max_than_0" style="row-gap: 10px;">
-            <BCol md="3" sm="6" v-for="menu in dynamic_menu">
-                <BCard @click="() => select(menu)" :class="{ active: select_menu.code === menu.code }"
+        <BRow class="d-flex pt-3 px-3" v-if="isMaxThan0" style="row-gap: 10px;">
+            <BCol md="3" sm="6" v-for="menu in dynamicMenu">
+                <BCard @click="() => select(menu)" :class="{ active: selectMenu.code === menu.code }"
                     class="hover-style-card rounded-4 d-flex gap-5 ">
                     <Icon :icon="menu.icon" width="35" height="35" style="color: #ca00cc" />
                     <p class="m-0 pt-2">{{ $t(`menu.${menu.name}._`) }}</p>
@@ -17,7 +17,7 @@
             </BCol>
         </BRow>
         <!-- don't have menu on our system -->
-        <BRow v-else :class="[!is_max_than_0 ? 'calc-height' : '', style.flex_center]">
+        <BRow v-else :class="[!isMaxThan0 ? 'calc-height' : '', style.flex_center]">
             <BCol md="3" sm="6">
                 <BCard class="rounded-4 gap-5 " :class="style.flex_center">
                     <div :class="style.flex_center">
@@ -27,17 +27,19 @@
                 </BCard>
             </BCol>
         </BRow>
-        <BRow class="pt-4 ps-3" v-if="is_select_sub_menu">
+        <BRow class="pt-4 ps-3" v-if="isSelectSubMenu">
             <div class="ps-3 fs-5">
-                {{ $t("header.menu_of") }} {{ $t(`menu.${select_menu.name}._`) }}
+                {{ $t("header.menu_of") }} {{ $t(`menu.${selectMenu.name}._`) }}
             </div>
         </BRow>
-        <BRow class="d-flex pt-3 px-3" v-if="is_select_sub_menu" style="row-gap: 10px;">
-            <BCol md="3" sm="6" v-for="sub in select_menu.sub">
-                <BCard @click="() => selectSubMenu(sub)" class="hover-style-card rounded-4 d-flex gap-5 ">
-                    <Icon :icon="sub.icon" width="35" height="35" style="color: #ca00cc" />
-                    <p class="m-0 pt-2">{{ $t(`menu.${select_menu.name}.${sub.name}`) }}</p>
-                </BCard>
+        <BRow class="d-flex pt-3 px-3" v-if="isSelectSubMenu" style="row-gap: 10px;">
+            <BCol md="3" sm="6" v-for="sub in selectMenu.sub">
+                <RouterLink :to="sub.url"  class="gap-5 ">
+                    <BCard @click="() => onSelectSubMenu(sub)" class="hover-style-card rounded-4 d-flex ">
+                        <Icon :icon="sub.icon" width="35" height="35" style="color: #ca00cc" />
+                        <p class="m-0 pt-2">{{ $t(`menu.${selectMenu.name}.${sub.name}`) }}</p>
+                    </BCard>
+                </RouterLink>
             </BCol>
         </BRow>
 
@@ -47,34 +49,35 @@
 <script setup lang="ts">
 import { BCard, BCol, BContainer, BRow } from 'bootstrap-vue-next';
 import { StyleUtil } from '../utils/StyleUtil';
-import { menuConfig } from '../constants/menu-config';
+import { menuConfig } from '../constants/menuConstant';
 import { Icon } from '@iconify/vue';
 import { computed, ref } from 'vue';
-import type { MenuConfigType, MenuProperties } from '../types/menu_type';
+import type { MenuConfigType, MenuProperties } from '../types/menuType';
 import UIInput from './ui/UIInput.vue';
-import { StringConstant } from '../constants/string-constant';
+import { StringConstant } from '../constants/stringConstant';
+import { RouterLink } from 'vue-router';
 
 const menus = menuConfig;
 const style = StyleUtil;
 
 const search = ref<string>("")
-const dynamic_menu = ref<MenuConfigType[]>(menus);
-const select_menu = ref<MenuConfigType>({} as MenuConfigType);
-const select_sub_menu = ref<MenuProperties>({} as MenuProperties);
+const dynamicMenu = ref<MenuConfigType[]>(menus);
+const selectMenu = ref<MenuConfigType>({} as MenuConfigType);
+const selectSubMenu = ref<MenuProperties>({} as MenuProperties);
 
-const is_max_than_0 = computed(() => dynamic_menu.value.length > 0);
-const is_select_sub_menu = computed(() => select_menu.value && select_menu.value.code?.length > 0);
+const isMaxThan0 = computed(() => dynamicMenu.value.length > 0);
+const isSelectSubMenu = computed(() => selectMenu.value && selectMenu.value.code?.length > 0);
 
 const onDebounce = () => {
-    dynamic_menu.value = menus.filter((menu: MenuConfigType) => menu.name.includes(search.value))
+    dynamicMenu.value = menus.filter((menu: MenuConfigType) => menu.name.includes(search.value))
 }
 const select = (menu: MenuConfigType) => {
-    select_menu.value = menu;
+    selectMenu.value = menu;
     console.log(menu)
 }
 
-const selectSubMenu = (sub: MenuProperties) => {
-    select_sub_menu.value = sub;
+const onSelectSubMenu = (sub: MenuProperties) => {
+    selectSubMenu.value = sub;
 }
 
 </script>

@@ -1,4 +1,4 @@
-import type { MenuConfigType } from "../types/menu_type";
+import type { MenuConfigType } from "../types/menuType";
 
 // ----------- the module that we have to access on our system -----------
 export const menuConfig: MenuConfigType[] = [

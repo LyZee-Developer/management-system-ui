@@ -2,30 +2,34 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import { createBootstrap } from "bootstrap-vue-next";
-
+import { createPinia } from "pinia";
 // Required CSS
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 
 //them system
-import "./css/dark-mode.css"
-import "./css/bootstrap-style.scss"
+import "./css/dark-mode.css";
+import "./css/bootstrap-style.scss";
 // using notification with toast
 import Vue3Toastify, { type ToastContainerOptions } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 // controller langauge for our system
-import i18n from './i18n/i18n'
+import i18n from "./i18n/i18n";
 
 //support font with difference language
-import './css/font-style.css'
+import "./css/font-style.css";
 
 //style manage all of system
-import './css/ui-style.scss'
+import "./css/ui-style.scss";
+
+//manage our data in whole system
+const pinia = createPinia();
 
 createApp(App)
   .use(router)
   .use(i18n)
+  .use(pinia)
   .use(Vue3Toastify, {
     autoClose: 3000,
     // ...

@@ -1,5 +1,5 @@
 import { toast, type ToastOptions } from "vue3-toastify";
-import { StringConstant } from "../constants/string-constant";
+import { StringConstant } from "../constants/stringConstant";
 import ThemeUtil from "./ThemeUtil";
 const ToastUtil = () => {
   const theme = ThemeUtil();

@@ -1,4 +1,4 @@
-import type { StyleUtilType } from "../types/style_type";
+import type { StyleUtilType } from "../types/styleType";
 
 const StyleUtil: StyleUtilType = {
   flex_center: " d-flex justify-content-center align-items-center ",

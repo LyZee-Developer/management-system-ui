@@ -14,7 +14,7 @@ import { Icon } from '@iconify/vue';
 import { BFormInput, BInputGroup, BInputGroupText } from 'bootstrap-vue-next';
 import debounce from 'lodash/debounce'
 import { computed } from 'vue';
-import { StringConstant } from '../../constants/string-constant';
+import { StringConstant } from '../../constants/stringConstant';
 
 const model = defineModel<string>();
 const emit = defineEmits(["debounce"])
