@@ -36,6 +36,13 @@
   "system": {
     "search_feature_you_want": "មុខងារស្វែងរកដែលអ្នកចង់បាននៅទីនេះ...",
     "conversation": "ការសន្ទនា",
-    "message": "សារ"
+    "message": "សារ",
+    "name": "ឈ្មោះ",
+    "email": "អ៊ីមែល",
+    "phone": "ទូរស័ព្ទ",
+    "your_name_very_short": "ឈ្មោះរបស់អ្នកខ្លីណាស់។",
+    "your_password_is_weak": "ពាក្យសម្ងាត់របស់អ្នកខ្សោយពេក",
+    "name_is_not_allow_have_number": "ឈ្មោះមិនអនុញ្ញាតឱ្យមានលេខទេ។",
+    "name_not_allow_space": "ឈ្មោះរបស់អ្នកមានកន្លែងទំនេរ"
   }
 }

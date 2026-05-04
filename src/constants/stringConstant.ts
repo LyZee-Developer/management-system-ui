@@ -15,7 +15,7 @@ export const StringConstant: StringConstantType = {
   PROFILE: "profile",
   LOG_OUT: "logout",
   LOG_IN: "login",
-  FEMALE: "Female",
-  MALE: "Male",
+  FEMALE: "F",
+  MALE: "M",
   GENDER: "Gender"
 };
