@@ -1,5 +1,10 @@
 <template>
     <BContainer fluid class="w-100 ">
+        <BRow class="pt-4">
+            <div class="d-flex justify-content-center align-items-center gap-2">
+                <div class="typing m-0 fs-3">{{ welcomeToUsername }}</div>
+            </div>
+        </BRow>
         <BRow class="w-100 pt-4" :class="StyleUtil.flex_center">
             <BCol cols="5">
                 <BRow>
@@ -34,7 +39,7 @@
         </BRow>
         <BRow class="d-flex pt-3 px-3" v-if="isSelectSubMenu" style="row-gap: 10px;">
             <BCol md="3" sm="6" v-for="sub in selectMenu.sub">
-                <RouterLink :to="sub.url"  class="gap-5 ">
+                <RouterLink :to="sub.url" class="gap-5 ">
                     <BCard @click="() => onSelectSubMenu(sub)" class="hover-style-card rounded-4 d-flex ">
                         <Icon :icon="sub.icon" width="35" height="35" style="color: #ca00cc" />
                         <p class="m-0 pt-2">{{ $t(`menu.${selectMenu.name}.${sub.name}`) }}</p>
@@ -56,15 +61,19 @@ import type { MenuConfigType, MenuProperties } from '../types/menuType';
 import UIInput from './ui/UIInput.vue';
 import { StringConstant } from '../constants/stringConstant';
 import { RouterLink } from 'vue-router';
+import { useUserInfoStore } from '../store/UserInfoStrore';
+import type { UserInfo } from '../types/Register/RegisterType';
 
 const menus = menuConfig;
 const style = StyleUtil;
+const userInfoStore = useUserInfoStore();
 
 const search = ref<string>("")
 const dynamicMenu = ref<MenuConfigType[]>(menus);
 const selectMenu = ref<MenuConfigType>({} as MenuConfigType);
 const selectSubMenu = ref<MenuProperties>({} as MenuProperties);
 
+const userInfo = computed<UserInfo>(() => userInfoStore.data.info);
 const isMaxThan0 = computed(() => dynamicMenu.value.length > 0);
 const isSelectSubMenu = computed(() => selectMenu.value && selectMenu.value.code?.length > 0);
 
@@ -79,6 +88,33 @@ const select = (menu: MenuConfigType) => {
 const onSelectSubMenu = (sub: MenuProperties) => {
     selectSubMenu.value = sub;
 }
+
+const welcomeToUsername = computed<string>(() => {
+    let hour = new Date().getHours();
+    let username =  (userInfo?.value?.gender == StringConstant.FEMALE ? `Mrs. ` : `Mr. `) + userInfo?.value?.name;
+    let message = "Welcome! Good ";
+    let icon = "";
+
+    if (hour >= 5 && hour < 12) {
+        message += 'morning';
+        icon = "🌄";
+    }
+    else if (hour >= 12 && hour < 17) {
+        message += 'afternoon';
+        icon = "🕑";
+    }
+    else if (hour >= 17 && hour < 21) {
+        message += 'evening';
+        icon = "🛣️";
+    }
+    else {
+        message += 'night';
+        icon = "🌙"
+    }
+    let fullMessage = message + " " + username + icon;
+    return fullMessage;
+})
+
 
 </script>
 <style scoped>

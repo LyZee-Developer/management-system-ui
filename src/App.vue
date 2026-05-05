@@ -13,9 +13,11 @@ import { BContainer } from 'bootstrap-vue-next';
 import Header from './components/Header.vue';
 import { RouteUtil } from './utils/RouteUtil';
 import { StringConstant } from './constants/stringConstant';
+import { useUserInfoStore } from './store/UserInfoStrore';
 const theme = ThemeUtil();
 const lang = LanguageUtil();
 const route = RouteUtil();
+const userInfoStore = useUserInfoStore();
 
 const isShowHeader = computed(() => {
     let paths = route.getPathList();
@@ -25,6 +27,7 @@ const isShowHeader = computed(() => {
 
 onMounted(() => {
     theme.setThemeToSystem();
+    userInfoStore.checkUserInfo();
     lang.setLanguage("en");
 })
 

@@ -73,3 +73,24 @@ $primary-end: #7b2ff7;
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+//***************** animation style typing *****************
+.typing {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: fit-content;
+  border-right: 2px solid #7b2ff7;
+
+  animation: typing 10s ease-in-out infinite;
+}
+
+@keyframes typing {
+  0%   { width: 0 }
+  50%  { width: 100% }  /* typing */
+  100% { width: 0% }     /* delete */
+}
+
+@keyframes blink {
+  50% { border-color: transparent }
+}

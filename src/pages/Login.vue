@@ -71,10 +71,7 @@
                     <BFormInput id="name" placeholder="Enter name" type="text" v-model="userInfo.name"
                         @input="userInfo.name = $event.replace(/[^a-zA-Z]/g, '')" />
                     <span class="text-danger p-0 fs-6 fst-italic"
-                        v-if="(userInfo.name.length < 5 && userInfo.name.length > 0) && !containNumber">{{
-                            $t("system.your_name_very_short") }}</span>
-                    <span class="text-danger p-0 fs-6 fst-italic"
-                        v-else-if="containNumber && userInfo.name.length > 0">{{
+                        v-if="containNumber && userInfo.name.length > 0">{{
                             $t("system.name_is_not_allow_have_number") }}</span>
                 </BRow>
                 <BRow>
@@ -110,7 +107,7 @@
 </template>
 <script setup lang="ts">
 import { BAvatar, BButton, BCard, BCol, BContainer, BDropdown, BDropdownItem, BFormInput, BModal, BRow } from 'bootstrap-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { ToastUtil } from '../utils/ToastUtil';
 import { genders } from '../constants/genderConstant';
 import { Icon } from '@iconify/vue';
@@ -122,12 +119,14 @@ import axios from 'axios';
 import { RouteUtil } from '../utils/RouteUtil';
 import { PasswordUtil } from '../utils/PasswordUtil';
 import type { LoginAccess } from '../types/Register/RegisterType';
+import { useUserInfoStore } from '../store/UserInfoStrore';
 
 const toast = ToastUtil();
 const generateColor = GenerateUtil();
 const route = RouteUtil();
 const obj = ObjectUtil();
 const pw = PasswordUtil();
+const useInfoStore = useUserInfoStore()
 
 const isCreateAccount = ref<boolean>(false);
 const isFirstLogin = ref<boolean>(true);
@@ -188,7 +187,6 @@ const getName = (): string => {
 }
 
 const onClickOk = () => {
-    console.log("ok")
     createNewAccount(true);
 }
 
@@ -203,6 +201,21 @@ watch(isCreateAccount, () => {
     data.value.confirmPassword = "";
     data.value.password = "";
 })
+
+onMounted(() => {
+    clearFormData();
+})
+
+const clearFormData = () => {
+    data.value.confirmPassword = "";
+    data.value.username = "";
+    data.value.password = "";
+
+    userInfo.value.email = "";
+    userInfo.value.gender = StringConstant.GENDER;
+    userInfo.value.phone = "";
+    userInfo.value.name = "";
+}
 
 const gender = computed<string>(() => {
     let isEmptyObject = obj.checkObject(pickGender.value);
@@ -264,7 +277,7 @@ const onClickSubmit = () => {
 const createNewAccount = async (isRegister: boolean) => {
     try {
         let url = `/api/user_login/${isRegister ? `register` : `login`}`;
-        let send:LoginAccess = {
+        let send: LoginAccess = {
             username: data.value.username,
             password: data.value.password,
             userInfo: {},
@@ -273,18 +286,27 @@ const createNewAccount = async (isRegister: boolean) => {
             send.userInfo.email = userInfo.value.email;
             send.userInfo.gender = userInfo.value.gender;
             send.userInfo.hex = hexColor.value;
-            send.userInfo.name = userInfo.value.name;
+            send.userInfo.name = userInfo.value.name == "" ? data.value.username : userInfo.value.name;
             send.userInfo.phone = userInfo.value.phone;
         }
         const response = await axios.post(url, send)
         if (response.data.status == "Success") {
-            let message = isRegister ? response.data.data : "Welcome to our system M-A-S 🎉🎉";
-            toast.show(message, "success");
-            route.setNewRoute("/")
+
+            let userLoginId = response.data.data;
+            let isSuccess = userLoginId > 0;
+            let message = isRegister ? isSuccess ? `Register account successfully!` : `Login fail!` : "Welcome to our system M-A-S 🎉🎉";
+
+            toast.show(message, isSuccess ? "success" : "error");
+
+            if (isSuccess) {
+                useInfoStore.getUserInfo(userLoginId);
+                route.setNewRoute("/")
+            }
+
         }
-        console.log(response)
         setIsProcessLogin(false);
     } catch (error: any) {
+        isProcessLogin.value = false;
         if (error.response) {
             toast.show(error.response.data.errors, "error");
         }

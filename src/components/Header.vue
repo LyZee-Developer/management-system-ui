@@ -15,8 +15,10 @@
                     <b class="">M-A-S</b>
                     <p class="m-0 p-0 " style="font-size: 13px; height: 20px;">{{ time }}</p>
                   </div>
+
                 </BButton>
               </template>
+
               {{ $t("header.management_all_system") }}
             </BTooltip>
           </BCol>
@@ -24,7 +26,15 @@
             {{ time }}
           </BCol> -->
           <BCol sm="6" md="6" :class="style.flex_end" class="text-white gap-3">
-
+            <BTooltip>
+              <template #target>
+                <BAvatar size="35" role="button" :active="true"
+                  :style="{ backgroundColor: `${userInfo?.hex} !important`, color: '#fff' }">
+                  <div class="fs-6">{{ userInfo?.name?.slice(0, 1) }}</div>
+                </BAvatar>
+              </template>
+              {{ userInfo?.name || "" }}
+            </BTooltip>
             <BAvatar size="35" role="button" :active="true" class="bg-white text-primary">
               <Icon :icon="isDarkReactive.value ? 'proicons:brightness' : 'proicons:dark-theme'" width="24" height="24"
                 @click="onChangeTheme" />
@@ -54,10 +64,11 @@
                   <BAvatar size="35" class="bg-transparent">
                     <Icon :icon="item.icon!" width="301" height="193" />
                   </BAvatar>
-                  <div>{{ item.name }}</div>
+                  <div>{{ $t('system.' + item.name.toLowerCase()) }}</div>
                 </div>
               </BDropdownItem>
             </BDropdown>
+
           </BCol>
         </BRow>
 
@@ -91,16 +102,20 @@ import { RouteUtil } from '../utils/RouteUtil';
 import { StringConstant } from '../constants/stringConstant';
 import { SettingItems } from '../constants/settingConstant';
 import type { BaseType } from '../types/baseType';
+import { useUserInfoStore } from '../store/UserInfoStrore';
+import type { UserInfo } from '../types/Register/RegisterType';
 
 const route = RouteUtil();
 const headerStore = useHeaderStore();
 const lang = LanguageUtil();
 const theme = ThemeUtil();
+const useInfoStore = useUserInfoStore();
 
 const DURATION = 1000;
 const time = ref<string>();
 const selectLanguage = ref<LanguageType>({} as LanguageType);
 const isDarkReactive = computed(() => useDark());
+const userInfo = computed<UserInfo>(() => useInfoStore.data.info);
 const isShowBreadcrumb = computed(() => headerStore.data.isShowBreadcrumb ?? false);
 
 onMounted(() => {
@@ -130,6 +145,7 @@ const onSetting = (value: BaseType) => {
   switch (value.code) {
     case StringConstant.LOG_OUT: url = "login";
       headerStore.setIsShowBreadcrumb(false);
+      useInfoStore.clearLocalUserInfo();
       break;
     case StringConstant.PROFILE: url = "profile"
       break;

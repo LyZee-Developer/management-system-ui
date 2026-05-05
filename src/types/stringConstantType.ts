@@ -13,4 +13,5 @@ export interface StringConstantType{
   FEMALE : string,
   MALE : string,
   GENDER : string,
+  USER_INFO : string,
 }
