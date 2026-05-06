@@ -45,6 +45,9 @@
     "name_is_not_allow_have_number": "Name isn't allow to have number",
     "name_not_allow_space": "Your name has space",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "user_active": "User",
+    "other": "Other",
+    "no_data_available": "No data available"
   }
 }

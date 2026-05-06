@@ -45,6 +45,9 @@
     "name_is_not_allow_have_number": "ឈ្មោះមិនអនុញ្ញាតឱ្យមានលេខទេ។",
     "name_not_allow_space": "ឈ្មោះរបស់អ្នកមានកន្លែងទំនេរ",
     "profile": "ប្រវត្តិរូប",
-    "logout": "ចេញ"
+    "logout": "ចេញ",
+    "user_active": "អ្នកប្រើប្រាស់សកម្ម",
+    "other": "ផ្សេងៗ",
+    "no_data_available": "មិនមានទិន្នន័យទេ"
   }
 }

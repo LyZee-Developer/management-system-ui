@@ -14,4 +14,6 @@ export interface StringConstantType{
   MALE : string,
   GENDER : string,
   USER_INFO : string,
+  TOKEN : string,
+  SUCCESS : string,
 }

@@ -70,9 +70,8 @@
                     <label class="p-0" for="name">{{ $t("system.name") }}</label>
                     <BFormInput id="name" placeholder="Enter name" type="text" v-model="userInfo.name"
                         @input="userInfo.name = $event.replace(/[^a-zA-Z]/g, '')" />
-                    <span class="text-danger p-0 fs-6 fst-italic"
-                        v-if="containNumber && userInfo.name.length > 0">{{
-                            $t("system.name_is_not_allow_have_number") }}</span>
+                    <span class="text-danger p-0 fs-6 fst-italic" v-if="containNumber && userInfo.name.length > 0">{{
+                        $t("system.name_is_not_allow_have_number") }}</span>
                 </BRow>
                 <BRow>
                     <label class="p-0" for="email">{{ $t("system.email") }}</label>
@@ -120,6 +119,7 @@ import { RouteUtil } from '../utils/RouteUtil';
 import { PasswordUtil } from '../utils/PasswordUtil';
 import type { LoginAccess } from '../types/Register/RegisterType';
 import { useUserInfoStore } from '../store/UserInfoStrore';
+import { ApiUtil } from '../utils/HttpUtil';
 
 const toast = ToastUtil();
 const generateColor = GenerateUtil();
@@ -127,6 +127,7 @@ const route = RouteUtil();
 const obj = ObjectUtil();
 const pw = PasswordUtil();
 const useInfoStore = useUserInfoStore()
+const api = ApiUtil();
 
 const isCreateAccount = ref<boolean>(false);
 const isFirstLogin = ref<boolean>(true);
@@ -276,7 +277,7 @@ const onClickSubmit = () => {
 
 const createNewAccount = async (isRegister: boolean) => {
     try {
-        let url = `/api/user_login/${isRegister ? `register` : `login`}`;
+        let url = `/api/auth/${isRegister ? `register` : `login`}`;
         let send: LoginAccess = {
             username: data.value.username,
             password: data.value.password,
@@ -290,16 +291,16 @@ const createNewAccount = async (isRegister: boolean) => {
             send.userInfo.phone = userInfo.value.phone;
         }
         const response = await axios.post(url, send)
-        if (response.data.status == "Success") {
+        if (response.data.status == StringConstant.SUCCESS) {
 
-            let userLoginId = response.data.data;
+            let userLoginId = isRegister ? response.data?.data ?? 0 : response.data?.data?.id;
             let isSuccess = userLoginId > 0;
             let message = isRegister ? isSuccess ? `Register account successfully!` : `Login fail!` : "Welcome to our system M-A-S 🎉🎉";
 
             toast.show(message, isSuccess ? "success" : "error");
 
             if (isSuccess) {
-                useInfoStore.getUserInfo(userLoginId);
+                useInfoStore.getUserInfo(userLoginId, response.data?.data?.token ?? "");
                 route.setNewRoute("/")
             }
 
