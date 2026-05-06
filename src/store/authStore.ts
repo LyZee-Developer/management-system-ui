@@ -12,7 +12,7 @@ export const useAuthStore = defineStore("authStore", () => {
     accountInfo: {},
     token: "",
   });
-
+  
   const authLogin = () => {};
   return {
     data,

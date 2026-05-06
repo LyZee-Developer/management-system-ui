@@ -104,12 +104,14 @@ import { SettingItems } from '../constants/settingConstant';
 import type { BaseType } from '../types/baseType';
 import { useUserInfoStore } from '../store/UserInfoStrore';
 import type { UserInfo } from '../types/Register/RegisterType';
+import { ApiUtil } from '../utils/HttpUtil';
 
 const route = RouteUtil();
 const headerStore = useHeaderStore();
 const lang = LanguageUtil();
 const theme = ThemeUtil();
 const useInfoStore = useUserInfoStore();
+const api = ApiUtil();
 
 const DURATION = 1000;
 const time = ref<string>();
@@ -118,12 +120,15 @@ const isDarkReactive = computed(() => useDark());
 const userInfo = computed<UserInfo>(() => useInfoStore.data.info);
 const isShowBreadcrumb = computed(() => headerStore.data.isShowBreadcrumb ?? false);
 
-onMounted(() => {
-  setInterval(() => {
-    time.value = moment().format('DD MMMM YYYY, h:mm:ssA');
-  }, DURATION)
-  selectLanguage.value = languages.find((langauge: LanguageType) => langauge.code == "en")!;
+
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+  let paths = route.getPathList() ?? [];
+  let breadcrumbs = paths.map((path) => ({ text: path }));
+  let items = isShowBreadcrumb.value ? breadcrumbs : [];
+  return items;
 })
+
+
 
 const onHomePage = () => {
   headerStore.setIsShowBreadcrumb(false);
@@ -146,24 +151,35 @@ const onSetting = (value: BaseType) => {
     case StringConstant.LOG_OUT: url = "login";
       headerStore.setIsShowBreadcrumb(false);
       useInfoStore.clearLocalUserInfo();
+      requestLogout(url);
       break;
     case StringConstant.PROFILE: url = "profile"
       break;
   }
   // change to other page
-  route.setNewRoute(url);
+  
 }
 
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
-  let paths = route.getPathList() ?? [];
-  let breadcrumbs = paths.map((path) => ({ text: path }));
-  let items = isShowBreadcrumb.value ? breadcrumbs : [];
-  return items;
-})
+const requestLogout = async (url: string) => {
+  const res = await api.https({
+    url: "api/user_login/logout",
+    data: {},
+    method: 'get'
+  })
+  console.log(res);
+  route.setNewRoute(url);
+}
 
 const onBackUrl = () => {
   route.goBack();
 }
+
+onMounted(() => {
+  setInterval(() => {
+    time.value = moment().format('DD MMMM YYYY, h:mm:ssA');
+  }, DURATION)
+  selectLanguage.value = languages.find((langauge: LanguageType) => langauge.code == "en")!;
+})
 
 </script>
 

@@ -36,8 +36,9 @@
                 </BAvatar>
                 <div>
                   <p class="m-0 p-0">{{ user.username }}</p>
-                  <p class="p-0 m-0 text-success" style="font-size: 12px;" v-if="user.lastAccess != null">online</p>
-                  <p class="p-0 m-0 text-secondary" style="font-size: 12px;" v-else>offline</p>
+                  <p class="p-0 m-0 text-success" style="font-size: 12px;" v-if="user.lastAccess?.type == StringConstant.OPEN">online</p>
+                  <p class="p-0 m-0 text-secondary" style="font-size: 12px;"
+                    v-else-if="user.lastAccess == null || user.lastAccess?.type == StringConstant.CLOSE">offline</p>
                 </div>
               </div>
             </BRow>
@@ -112,12 +113,8 @@ import { onMounted, ref } from 'vue';
 import { RouteUtil } from '../../utils/RouteUtil';
 import { ApiUtil } from '../../utils/HttpUtil';
 import { useAuthStore } from '../../store/authStore';
-
-interface UserAccessOnlineType {
-  colorName: string,
-  lastAccess: null | any
-  username: string
-}
+import type { UserAccessOnlineType } from '../../types/chatType';
+import { StringConstant } from '../../constants/stringConstant';
 
 const useAuth = useAuthStore();
 

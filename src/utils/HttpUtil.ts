@@ -11,11 +11,11 @@ export const ApiUtil = () => {
   const https = async (api: ApiType) => {
     try {
       let token = auth.data.token;
-      console.log(token)
+      console.log(token);
       if (token == "") {
         let localStore = localStorage.getItem(StringConstant.TOKEN)!;
         token = localStore;
-      } 
+      }
       let header = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -34,7 +34,11 @@ export const ApiUtil = () => {
       return res?.data;
     } catch (error: any) {
       if (error.response) {
-        toast.show(error.response.data.errors, "error");
+        let messge =
+          error.response.data.errors == undefined
+            ? "Something went wrong!."
+            : error.response.data.errors;
+        toast.show(messge, "error");
       }
     }
   };

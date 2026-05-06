@@ -21,4 +21,6 @@ export const StringConstant: StringConstantType = {
   USER_INFO: "user_info",
   SUCCESS: "Success",
   TOKEN: "token",
+  CLOSE: "Close",
+  OPEN: "Open",
 };

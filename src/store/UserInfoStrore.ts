@@ -45,7 +45,7 @@ export const useUserInfoStore = defineStore("userInfo", () => {
     localStorage.setItem(StringConstant.USER_INFO, JSON.stringify(data));
     localStorage.setItem(StringConstant.TOKEN, token);
   };
-  
+
   const checkUserInfo = () => {
     let userInfo = localStorage.getItem(StringConstant.USER_INFO)!;
     let obj = JSON.parse(userInfo);
@@ -54,6 +54,7 @@ export const useUserInfoStore = defineStore("userInfo", () => {
       return;
     }
     data.info = JSON.parse(userInfo);
+    auth.data.accountInfo = data?.info;
   };
 
   const clearLocalUserInfo = () => {

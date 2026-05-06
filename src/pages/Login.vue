@@ -296,6 +296,8 @@ const createNewAccount = async (isRegister: boolean) => {
             let userLoginId = isRegister ? response.data?.data ?? 0 : response.data?.data?.id;
             let isSuccess = userLoginId > 0;
             let message = isRegister ? isSuccess ? `Register account successfully!` : `Login fail!` : "Welcome to our system M-A-S 🎉🎉";
+            console.log(message)
+            if (message == "") message = "Something went wrong!."
 
             toast.show(message, isSuccess ? "success" : "error");
 
@@ -309,7 +311,8 @@ const createNewAccount = async (isRegister: boolean) => {
     } catch (error: any) {
         isProcessLogin.value = false;
         if (error.response) {
-            toast.show(error.response.data.errors, "error");
+            let messge = error.response.data.errors == undefined ? "Something went wrong!." : error.response.data.errors;
+            toast.show(messge, "error");
         }
     }
 }
