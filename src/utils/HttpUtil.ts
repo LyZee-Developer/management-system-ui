@@ -25,7 +25,6 @@ export const ApiUtil = () => {
       let res = {
         data: {},
       };
-      console.log(token);
       if (api.method == "get") res = await axios.get(api.url, header);
       else if (api.method == "post") {
         res = await axios.post(api.url, api.data, header);
@@ -40,10 +39,10 @@ export const ApiUtil = () => {
             : error.response.data.errors;
         toast.show(messge, "error");
       }
+      throw new Error(error.response.data.errors);
     }
   };
 
-  const useGet = async (method: "get" | "post" | "put" | "delete") => {};
   return {
     https,
   };

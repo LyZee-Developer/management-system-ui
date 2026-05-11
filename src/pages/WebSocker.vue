@@ -13,7 +13,7 @@ let client: Client
 
 onMounted(() => {
   client = new Client({
-    brokerURL: 'ws://localhost:6780/ws', // ✅ direct WebSocket
+    brokerURL: 'http://localhost:6780/ws', // ✅ direct WebSocket
     reconnectDelay: 5000,
     debug: (str) => {
       console.log("dubug =>",str)

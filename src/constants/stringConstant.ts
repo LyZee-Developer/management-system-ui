@@ -23,4 +23,8 @@ export const StringConstant: StringConstantType = {
   TOKEN: "token",
   CLOSE: "Close",
   OPEN: "Open",
+  POST: "post",
+  GET: "get",
+  ONLINE: "online",
+  OFFLINE: "offline",
 };
