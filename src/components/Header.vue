@@ -152,6 +152,7 @@ const onSetting = (value: BaseType) => {
       headerStore.setIsShowBreadcrumb(false);
       useInfoStore.clearLocalUserInfo();
       requestLogout(url);
+      route.setNewRoute(url);
       break;
     case StringConstant.PROFILE: url = "profile"
       break;

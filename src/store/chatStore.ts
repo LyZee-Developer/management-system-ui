@@ -78,11 +78,16 @@ export const useChatStore = defineStore("chatStore", () => {
     fn?.();
   };
 
+  const clearMessage = () => {
+    data.messages = [];
+  }
+
   return {
     data,
     getChat,
     getConversationMessage,
     sendMessage,
     startChat,
+    clearMessage,
   };
 });

@@ -8,20 +8,29 @@
             <b>{{ $t("system.conversation") }}</b>
           </BRow>
           <div class="d-flex flex-column gap-3 mt-3">
+            {{ console.log("conversations", conversations) }}
             <BRow class="hover-card" v-if="conversations.length > 0" v-for="conversation in conversations">
-              <div class="d-flex gap-2" v-if="conversation.members.length == 1"
-                @click="() => onSelectedChated(conversation)">
-                <BAvatar size="38" :style="{ 'background-color': `${conversation.members[0].user.hex} !important` }">
-                  {{ conversation.members[0].user.name.slice(0, 1) }}
-                </BAvatar>
-                <div>
-                  <p class="m-0 p-0">{{ conversation.members[0].user.name }}</p>
-                  <p class="p-0 m-0 text-success"
-                    v-if="getStatusUser(conversation.members[0]?.user?.userLogin?.TrackUserAccesses) == StringConstant.ONLINE"
-                    style="font-size: 12px;">{{
+              <div class="d-flex gap-2 justify-content-between align-items-center"
+                v-if="conversation.members.length == 1" @click="() => onSelectedChated(conversation)">
+                <div class="d-flex gap-2">
+                  <BAvatar size="38" :style="{ 'background-color': `${conversation.members[0].user.hex} !important` }">
+                    {{ conversation.members[0].user.name.slice(0, 1) }}
+                  </BAvatar>
+                  <div>
+                    <p class="m-0 p-0">{{ conversation.members[0].user.name }}</p>
+                    <p class="p-0 m-0 text-success"
+                      v-if="getStatusUser(conversation.members[0]?.user?.userLogin?.TrackUserAccesses) == StringConstant.ONLINE"
+                      style="font-size: 12px;">{{
+                        getStatusUser(conversation.members[0]?.user?.userLogin?.TrackUserAccesses) }}</p>
+                    <p class="p-0 m-0 text-secondary" v-else style="font-size: 12px;">{{
                       getStatusUser(conversation.members[0]?.user?.userLogin?.TrackUserAccesses) }}</p>
-                  <p class="p-0 m-0 text-secondary" v-else style="font-size: 12px;">{{
-                    getStatusUser(conversation.members[0]?.user?.userLogin?.TrackUserAccesses) }}</p>
+                  </div>
+                </div>
+                <!-- //*********** did not read message */ -->
+                <div class="rounded-5 bg-success d-flex justify-content-center align-items-center"
+                  style="width: 20px; height: 20px;">
+                  <p class="p-0 m-0" style="font-size: 10px;">{{ (conversation.messages.length -
+                    conversation?.me[0]?.readCount) || 0 }}</p>
                 </div>
               </div>
             </BRow>
@@ -173,6 +182,7 @@ const conversations = computed(() => {
   return chatStore.data.conversations.map((chat: ChatType) => {
     return {
       ...chat,
+      me: chat.members.filter((member: Member) => member.user.id == currentUserId.value),
       members: chat.members.filter((member: Member) => member.user.id != currentUserId.value)
     }
   })
@@ -238,6 +248,11 @@ const onSelectedUser = (user: UserAccessOnlineType) => {
   selectedUser.value = user;
   randomImage.value = img.randomImage();
   isCreateChat.value = true;
+  clearMessage();
+}
+
+const clearMessage = () => {
+  chatStore.clearMessage();
 }
 
 const onSelectedChated = (user: ChatType) => {
@@ -262,6 +277,8 @@ const loadChat = (fn?: () => void) => {
 
 onMounted(() => {
   route.checkBreadCrumb();
+  randomImage.value = img.randomImage();
+  clearMessage();
   loadChat(() => {
     getListUserOnline();
   });
