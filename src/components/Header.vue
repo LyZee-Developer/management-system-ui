@@ -48,7 +48,7 @@
                 v-for="language in languages">
                 <div class="d-flex align-items-center">
                   <BAvatar size="35" class="bg-transparent">
-                    <Icon :icon="language.icon" width="301" height="193" />
+                    <Icon :icon="language.icon" class="text-secondary-emphasis" width="301" height="193" />
                   </BAvatar>
                   <div>{{ language.name }}</div>
                 </div>
@@ -59,10 +59,10 @@
               <template #button-content class="bg-transparent ">
                 <Icon icon="proicons:settings" width="26" height="26" />
               </template>
-              <BDropdownItem @click="() => onSetting(item)" v-for="item in SettingItems">
+              <BDropdownItem @click="() => onSetting(item)" v-for="item in SettingConstant">
                 <div class="d-flex align-items-center">
                   <BAvatar size="35" class="bg-transparent">
-                    <Icon :icon="item.icon!" width="301" height="193" />
+                    <Icon :icon="item.icon!" class="text-secondary-emphasis" width="301" height="193" />
                   </BAvatar>
                   <div>{{ $t('system.' + item.name.toLowerCase()) }}</div>
                 </div>
@@ -100,7 +100,7 @@ import { RouterLink } from 'vue-router';
 import { useHeaderStore } from '../store/headerStore';
 import { RouteUtil } from '../utils/RouteUtil';
 import { StringConstant } from '../constants/stringConstant';
-import { SettingItems } from '../constants/settingConstant';
+import { SettingConstant } from '../constants/valueConstant';
 import type { BaseType } from '../types/baseType';
 import { useUserInfoStore } from '../store/UserInfoStrore';
 import type { UserInfo } from '../types/Register/RegisterType';
@@ -151,6 +151,7 @@ const onSetting = (value: BaseType) => {
     case StringConstant.LOG_OUT: url = "login";
       headerStore.setIsShowBreadcrumb(false);
       useInfoStore.clearLocalUserInfo();
+      clearLocalSelectUserChat()
       requestLogout(url);
       route.setNewRoute(url);
       break;
@@ -158,7 +159,11 @@ const onSetting = (value: BaseType) => {
       break;
   }
   // change to other page
-  
+
+}
+
+const clearLocalSelectUserChat = () =>{
+  localStorage.removeItem(StringConstant.SELECT_USER);
 }
 
 const requestLogout = async (url: string) => {

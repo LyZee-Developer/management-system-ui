@@ -14,10 +14,11 @@
         </BRow>
         <BRow class="d-flex pt-3 px-3" v-if="isMaxThan0" style="row-gap: 10px;">
             <BCol md="3" sm="6" v-for="menu in dynamicMenu">
-                <BCard @click="() => select(menu)" :class="{ active: selectMenu.code === menu.code }"
+                <BCard @click="() => select(menu)"
+                    :class="{ active: menuStore.data.selectedParent?.code === menu.code }"
                     class="hover-style-card rounded-4 d-flex gap-5 ">
                     <Icon :icon="menu.icon" width="35" height="35" style="color: #ca00cc" />
-                    <p class="m-0 pt-2">{{ $t(`menu.${menu.name}._`) }}</p>
+                    <p class="m-0 pt-2">{{ $t(`menu.${menu.code}._`) }}</p>
                 </BCard>
             </BCol>
         </BRow>
@@ -32,17 +33,19 @@
                 </BCard>
             </BCol>
         </BRow>
-        <BRow class="pt-4 ps-3" v-if="isSelectSubMenu">
+        <BRow class="pt-4 ps-3" v-if="menuStore.data.selectedParent && menuStore.data.selectedParent?.code?.length > 0">
             <div class="ps-3 fs-5">
-                {{ $t("header.menu_of") }} {{ $t(`menu.${selectMenu.name}._`) }}
+                {{ $t("header.menu_of") }} {{ $t(`menu.${menuStore.data.selectedParent?.code}._`) }}
             </div>
         </BRow>
-        <BRow class="d-flex pt-3 px-3" v-if="isSelectSubMenu" style="row-gap: 10px;">
-            <BCol md="3" sm="6" v-for="sub in selectMenu.sub">
+        <BRow class="d-flex pt-3 px-3"
+            v-if="menuStore.data.selectedParent && menuStore.data.selectedParent?.code?.length > 0"
+            style="row-gap: 10px;">
+            <BCol md="3" sm="6" v-for="sub in menuStore.data.selectedParent?.sub">
                 <RouterLink :to="sub.url" class="gap-5 ">
                     <BCard @click="() => onSelectSubMenu(sub)" class="hover-style-card rounded-4 d-flex ">
                         <Icon :icon="sub.icon" width="35" height="35" style="color: #ca00cc" />
-                        <p class="m-0 pt-2">{{ $t(`menu.${selectMenu.name}.${sub.name}`) }}</p>
+                        <p class="m-0 pt-2">{{ $t(`menu.${menuStore.data.selectedParent?.code}.${sub.code}`) }}</p>
                     </BCard>
                 </RouterLink>
             </BCol>
@@ -56,17 +59,21 @@ import { BCard, BCol, BContainer, BRow } from 'bootstrap-vue-next';
 import { StyleUtil } from '../utils/StyleUtil';
 import { menuConfig } from '../constants/menuConstant';
 import { Icon } from '@iconify/vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { MenuConfigType, MenuProperties } from '../types/menuType';
 import UIInput from './ui/UIInput.vue';
 import { StringConstant } from '../constants/stringConstant';
 import { RouterLink } from 'vue-router';
 import { useUserInfoStore } from '../store/UserInfoStrore';
 import type { UserInfo } from '../types/Register/RegisterType';
+import { useMenuStore } from '../store/menuStore';
+import { RouteUtil } from '../utils/RouteUtil';
 
+const route = RouteUtil();
 const menus = menuConfig;
 const style = StyleUtil;
 const userInfoStore = useUserInfoStore();
+const menuStore = useMenuStore();
 
 const search = ref<string>("")
 const dynamicMenu = ref<MenuConfigType[]>(menus);
@@ -77,21 +84,52 @@ const userInfo = computed<UserInfo>(() => userInfoStore.data.info);
 const isMaxThan0 = computed(() => dynamicMenu.value.length > 0);
 const isSelectSubMenu = computed(() => selectMenu.value && selectMenu.value.code?.length > 0);
 
+watch(search, () => {
+    menuStore.data.selectedParent = {} as MenuConfigType;
+    if (search.value == "") {
+        dynamicMenu.value = menus;
+    }
+})
+
 const onDebounce = () => {
-    dynamicMenu.value = menus.filter((menu: MenuConfigType) => menu.name.includes(search.value))
+    dynamicMenu.value = menus.filter((menu: MenuConfigType) => {
+        return menu.name.includes(search.value);
+    })
+
+    const getSub = menus.map((menu: MenuConfigType) => menu.sub).flat();
+    const convertToMenu = getSub.filter((sub: MenuProperties) => sub.name.includes(search.value) && search.value !== "").map((val: any) => {
+        return {
+            code: val.code,
+            icon: val.icon,
+            name: val.name,
+            type: val.type,
+            url: val.url
+        } as MenuConfigType;
+    });
+
+    //************* merge data between parent and sub *****************/
+    dynamicMenu.value = [...dynamicMenu.value, ...convertToMenu];
+
+    console.log("result", dynamicMenu.value)
 }
 const select = (menu: MenuConfigType) => {
-    selectMenu.value = menu;
     console.log(menu)
+    if (menu.type == "sub_module") {
+        route.setNewRoute(menu.url)
+        return;
+    }
+    selectMenu.value = menu;
+    menuStore.data.selectedParent = menu;
 }
 
 const onSelectSubMenu = (sub: MenuProperties) => {
     selectSubMenu.value = sub;
+
 }
 
 const welcomeToUsername = computed<string>(() => {
     let hour = new Date().getHours();
-    let username =  (userInfo?.value?.gender == StringConstant.FEMALE ? `Mrs. ` : `Mr. `) + userInfo?.value?.name;
+    let username = (userInfo?.value?.gender == StringConstant.FEMALE ? `Mrs. ` : `Mr. `) + userInfo?.value?.name;
     let message = "Welcome! Good ";
     let icon = "";
 

@@ -22,7 +22,8 @@
     "budget": {
       "_": "Budget",
       "calculate_budget": "Calculate Budget",
-      "purchase_plan": "Purchase Plan"
+      "purchase_plan": "Purchase Plan",
+      "break_money": "Break Money"
     }
   },
   "header": {
@@ -48,6 +49,10 @@
     "logout": "Logout",
     "user_active": "User",
     "other": "Other",
-    "no_data_available": "No data available"
+    "no_data_available": "No data available",
+    "clear_chat": "Clear Message",
+    "block": "Block",
+    "unSend": "unsend",
+    "unsend": "Unsend"
   }
 }

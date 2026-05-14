@@ -22,7 +22,8 @@
     "budget": {
       "_": "ថវិកា",
       "calculate_budget": "គណនាថវិកា",
-      "purchase_plan": "ផែនការទិញ"
+      "purchase_plan": "ផែនការទិញ",
+      "break_money": "បំបែកលុយ"
     }
   },
   "header": {
@@ -48,6 +49,9 @@
     "logout": "ចេញ",
     "user_active": "អ្នកប្រើប្រាស់សកម្ម",
     "other": "ផ្សេងៗ",
-    "no_data_available": "មិនមានទិន្នន័យទេ"
+    "no_data_available": "មិនមានទិន្នន័យទេ",
+    "clear_chat": "ជម្រះសារ",
+    "block": "ទប់ស្កាត់",
+    "unsend": "មិនផ្ញើ"
   }
 }

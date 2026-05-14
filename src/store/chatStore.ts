@@ -16,6 +16,7 @@ export const useChatStore = defineStore("chatStore", () => {
   });
 
   const getChat = async (userId: number, fn?: () => void) => {
+    console.log("list");
     const res: any = await api.https({
       url: RouteApi.chat.list,
       data: {
@@ -43,8 +44,6 @@ export const useChatStore = defineStore("chatStore", () => {
       },
       method: StringConstant.POST,
     });
-    console.log(res?.data);
-    data.conversations = res?.data ?? [];
     fn?.();
   };
 
@@ -56,6 +55,33 @@ export const useChatStore = defineStore("chatStore", () => {
     });
     console.log("message", res?.data);
     data.messages = res?.data ?? [];
+    fn?.();
+  };
+
+  const deleteMessage = async (chatId: number, fn?: () => void) => {
+    await api.https({
+      url: `${RouteApi.chat.deleteMessage}/${chatId}`,
+      data: {},
+      method: StringConstant.GET,
+    });
+    fn?.();
+  };
+
+  const seenMessage = async (
+    lastMessageId: number,
+    seenById: number,
+    fn?: () => void,
+  ) => {
+    console.log("seen");
+    const res: any = await api.https({
+      url: `${RouteApi.chat.seenMessage}`,
+      data: {
+        userId: seenById,
+        messageId: lastMessageId,
+      },
+      method: StringConstant.POST,
+    });
+    console.log("message", res?.data);
     fn?.();
   };
 
@@ -80,7 +106,7 @@ export const useChatStore = defineStore("chatStore", () => {
 
   const clearMessage = () => {
     data.messages = [];
-  }
+  };
 
   return {
     data,
@@ -88,6 +114,8 @@ export const useChatStore = defineStore("chatStore", () => {
     getConversationMessage,
     sendMessage,
     startChat,
+    seenMessage,
+    deleteMessage,
     clearMessage,
   };
 });

@@ -1,6 +1,5 @@
-import type { StringConstantType } from "../types/stringConstantType";
 
-export const StringConstant: StringConstantType = {
+export const StringConstant = {
   // theme
   LIGHT: "light",
   DARK: "dark",
@@ -10,7 +9,6 @@ export const StringConstant: StringConstantType = {
   ZOOM: "zoom",
   SLASH: "/",
   MAX_0: 0,
-
 
   PROFILE: "profile",
   LOG_OUT: "logout",
@@ -25,6 +23,18 @@ export const StringConstant: StringConstantType = {
   OPEN: "Open",
   POST: "post",
   GET: "get",
+
   ONLINE: "online",
   OFFLINE: "offline",
+
+  CHATID: "chatId",
+  SELECT_USER: "selectUser",
+  BLOCK: "block",
+  CLEAR_CHAT: "clear_chat",
+  COLOR:{
+    MAIN_SYSTEM : "#6E026F"
+  },
+  MESSAGE_ACTION:{
+    UNSEND : "unsend"
+  }
 };

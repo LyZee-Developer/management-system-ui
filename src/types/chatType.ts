@@ -14,7 +14,7 @@ export interface LastAccessType {
 export interface Member {
   dateJoin: string;
   id: number;
-  readCount: number;
+  lastSeenMessageId: number;
   user: UserInfoType;
 }
 
@@ -48,7 +48,7 @@ export interface MessageType {
   createBy: string;
   createDate: string;
   delete: boolean;
-  id: boolean;
+  id: number;
   isActivate: boolean;
   pin: boolean;
   reactMessages: [];
