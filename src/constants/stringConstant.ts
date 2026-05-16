@@ -1,4 +1,3 @@
-
 export const StringConstant = {
   // theme
   LIGHT: "light",
@@ -31,10 +30,22 @@ export const StringConstant = {
   SELECT_USER: "selectUser",
   BLOCK: "block",
   CLEAR_CHAT: "clear_chat",
-  COLOR:{
-    MAIN_SYSTEM : "#6E026F"
+
+  COLOR: {
+    MAIN_SYSTEM: "#6E026F",
   },
-  MESSAGE_ACTION:{
-    UNSEND : "unsend"
-  }
+
+  MESSAGE_ACTION: {
+    UNSEND: "unsend",
+  },
+
+  ACTION: {
+    DELETE: "delete",
+    CREATE: "create",
+    UPDATE: "update",
+  },
+  
+  CODE: {
+    EMOJI: "EMOJI",
+  },
 };

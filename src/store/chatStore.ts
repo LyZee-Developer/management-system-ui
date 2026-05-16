@@ -24,7 +24,6 @@ export const useChatStore = defineStore("chatStore", () => {
       },
       method: StringConstant.POST,
     });
-    console.log(res?.data);
     data.conversations = res?.data ?? [];
     fn?.();
   };
@@ -47,6 +46,44 @@ export const useChatStore = defineStore("chatStore", () => {
     fn?.();
   };
 
+  const reactMessage = async (
+    messageId: number,
+    reactById: number,
+    emojiCode: string,
+    fn?: () => void,
+  ) => {
+    const res: any = await api.https({
+      url: RouteApi.chat.reactMessage,
+      data: {
+        messageId: messageId,
+        reactById: reactById,
+        emojiCode: emojiCode,
+      },
+      method: StringConstant.POST,
+    });
+
+    console.log("res", res);
+    fn?.();
+  };
+
+  const blockMessage = async (
+    chatId: number,
+    blockById: number,
+    fn?: () => void,
+  ) => {
+    const res: any = await api.https({
+      url: RouteApi.chat.blockMessage,
+      data: {
+        chatId: chatId,
+        blockBy: blockById,
+      },
+      method: StringConstant.POST,
+    });
+
+    console.log("res", res);
+    fn?.();
+  };
+
   const getConversationMessage = async (chatId: number, fn?: () => void) => {
     const res: any = await api.https({
       url: `${RouteApi.chat.conversation}/${chatId}`,
@@ -61,6 +98,15 @@ export const useChatStore = defineStore("chatStore", () => {
   const deleteMessage = async (chatId: number, fn?: () => void) => {
     await api.https({
       url: `${RouteApi.chat.deleteMessage}/${chatId}`,
+      data: {},
+      method: StringConstant.GET,
+    });
+    fn?.();
+  };
+
+  const deleteChat = async (chatId: number, fn?: () => void) => {
+    await api.https({
+      url: `${RouteApi.chat.deleteChat}/${chatId}`,
       data: {},
       method: StringConstant.GET,
     });
@@ -112,9 +158,12 @@ export const useChatStore = defineStore("chatStore", () => {
     data,
     getChat,
     getConversationMessage,
+    reactMessage,
     sendMessage,
+    blockMessage,
     startChat,
     seenMessage,
+    deleteChat,
     deleteMessage,
     clearMessage,
   };

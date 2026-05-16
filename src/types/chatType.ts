@@ -39,6 +39,7 @@ export interface TrackUserAccessesType {
 export interface ChatType {
   id: number;
   members: Member[];
+  isActivate: boolean;
   messages: MessageType[];
   roomName: null | string;
 }
@@ -51,10 +52,24 @@ export interface MessageType {
   id: number;
   isActivate: boolean;
   pin: boolean;
-  reactMessages: [];
-  reply: [];
+  reactMessages: ReactMessageType[];
+  reply: MessageType[];
   seenMessages: [];
   sendBy: UserInfoType;
   sendDate: string;
   type: null | any;
+}
+
+export interface ReactMessageType {
+  id: number;
+  reactBy: UserInfoType;
+  reactCode: {
+    child: [];
+    code: string;
+    description: string;
+    enName: string;
+    id: number;
+    name: string;
+  };
+  reactDate: string;
 }

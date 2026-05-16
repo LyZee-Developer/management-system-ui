@@ -8,12 +8,11 @@
             <b>{{ $t("system.conversation") }}</b>
           </BRow>
           <div class="d-flex flex-column gap-3 mt-3">
-            {{console.log("conversations =>", conversations)}}
             <BRow class="hover-card" v-if="conversations.length > 0" v-for="conversation in conversations">
               <div class="d-flex gap-2 justify-content-between align-items-center"
                 v-if="conversation.members.length == 1" @click="() => {
                   conversation.isUnreadMessage = false;
-                  onSelectedChated(conversation, getTotalUnread(conversation.id, [selectedUser.userId]).length > 0)
+                  onSelectedChated(conversation, getTotalUnread([selectedUser.userId]).length > 0)
                 }">
                 <div class="d-flex gap-2">
                   <BAvatar size="38" :style="{ 'background-color': `${conversation.members[0].user.hex} !important` }">
@@ -28,13 +27,14 @@
                     <p class="p-0 m-0 text-secondary" v-else style="font-size: 12px;">offline</p>
                   </div>
                 </div>
+
                 <!-- //*********** did not read message */ -->
                 <!-- && conversation.members[0].user?.id !== selectedUser.userId -->
                 <div v-if="conversation.isUnreadMessage"
                   class="rounded-5 bg-success d-flex justify-content-center align-items-center"
                   style="width: 20px; height: 20px;">
                   <p class="p-0 m-0 text-white" style="font-size: 10px;">{{
-                    getTotalUnread(conversation.id, conversation.members.map((member: any) => member.user.id)).length}}
+                    getTotalUnread(conversation.members.map((member: any) => member.user.id)).length}}
                   </p>
                 </div>
               </div>
@@ -122,37 +122,60 @@
               <div>Make your day with me {{ useAuth.data.accountInfo.name }}?</div>
             </div>
 
-
             <div class="d-flex flex-column gap-2" v-if="messages.length > 0" v-for="(message, index) in messages">
               <!-- //send message to other -->
               <div class="d-flex justify-content-end" v-if="message.sendBy.id == currentUserId">
                 <div class="d-flex gap-2  align-items-end position-relative"
                   :class="`${message.delete ? `` : `hover-action`}`">
                   <div class="action d-none">
-                    <BDropdown variant="dark" no-caret placement="left-start"
-                      toggle-class="bg-transparent text-secondary-emphasis  border-0 same-style-each p-2 rounded-5">
-                      <template #button-content class="bg-transparent ">
-                        <Icon icon="proicons:more" width="26" height="26" />
-                      </template>
-                      <BDropdownItem @click="() => onSelectMessage(item, message.id)" v-for="item in MessageAction">
-                        <div class="d-flex align-items-center">
-                          <BAvatar size="35" class="bg-transparent">
-                            <Icon :icon="item.icon!" class="text-secondary-emphasis" width="301" height="193" />
-                          </BAvatar>
-                          <div>{{ $t('system.' + item.code.toLowerCase()) }}</div>
-                        </div>
-                      </BDropdownItem>
-                    </BDropdown>
+                    <div class="d-flex gap-2">
+                      <!-- //*********** action of meesage ************ */ -->
+                      <BDropdown variant="dark" no-caret placement="left-start"
+                        toggle-class="bg-transparent text-secondary-emphasis  border-0 same-style-each p-2 rounded-5">
+                        <template #button-content class="bg-transparent ">
+                          <Icon icon="proicons:more" width="26" height="26" />
+                        </template>
+                        <BDropdownItem @click="() => onSelectMessage(item, message.id)" v-for="item in MessageAction">
+                          <div class="d-flex align-items-center">
+                            <BAvatar size="35" class="bg-transparent">
+                              <Icon :icon="item.icon!" class="text-secondary-emphasis" width="301" height="193" />
+                            </BAvatar>
+                            <div>{{ $t('system.' + item.code.toLowerCase()) }}</div>
+                          </div>
+                        </BDropdownItem>
+                      </BDropdown>
+
+                      <!-- //************ feeling about user  ************* */ -->
+                      <BDropdown variant="dark" no-caret placement="left-start"
+                        toggle-class="bg-transparent text-secondary-emphasis  border-0 same-style-each p-2 rounded-5">
+                        <template #button-content class="bg-transparent ">
+                          <Icon icon="fluent:emoji-add-16-regular" width="26" height="26" />
+                        </template>
+                        <BDropdownItem @click="() => onReactEmoji(emoji?.code, message?.id)"
+                          :active="isHasSelectEmoji(emoji?.code, message.reactMessages)" v-for="emoji in emojis">
+                          <div class="d-flex align-items-center">
+                            <div>{{ emoji.description }} {{ emoji.enName }}</div>
+                          </div>
+                        </BDropdownItem>
+                      </BDropdown>
+                    </div>
                   </div>
                   <BTooltip>
                     <template #target>
-                      <div class="bg-secondary-subtle d-flex flex-column align-items-end px-3 py-2 rounded-3"
+                      <div
+                        class="bg-secondary-subtle d-flex flex-column position-relative align-items-end px-3 py-2 rounded-3"
                         v-if="!message.delete">
                         <p class="m-0 p-0">{{
                           message.content
-                          }}</p>
+                        }}</p>
                         <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
                           moment(message.sendDate).format('LT') }}</p>
+                        <div class="d-flex gap-1 position-absolute" style="right: 10px; bottom: -13px;">
+                          <div class="bg-primary-subtle p-1 rounded-circle" style="font-size: 12px;"
+                            v-for="emoji in message.reactMessages">
+                            {{ emoji?.reactCode?.description }}
+                          </div>
+                        </div>
                       </div>
                       <div v-else class="px-3 py-2 rounded-3" style="background-color: #95959512;">
                         <Icon icon="material-symbols-light:warning" width="22" height="22" class="text-warning" />
@@ -184,8 +207,8 @@
               </div>
 
               <!-- receive message from other -->
-              <div class="d-flex gap-2 align-items-end" v-else>
-                <div class="d-flex gap-2">
+              <div class="d-flex gap-2 hover-action align-items-end" v-else>
+                <div class="d-flex gap-2 align-items-end">
                   <BAvatar size="38" v-if="checkIsShowAvatar(messages, index)"
                     :style="{ 'background-color': `${selectedUser.colorName} !important` }">
                     {{ selectedUser.username?.slice(0, 1) }}
@@ -194,18 +217,28 @@
                   </div>
                   <BTooltip>
                     <template #target>
-                      <div class="bg-secondary-subtle px-3 py-2 rounded-3" v-if="!message.delete">
-                        <p class="m-0 p-0">{{
-                          message.content
+                      <div v-if="!message.delete">
+                        <div class="bg-secondary-subtle mb-2 position-relative  px-3 py-2 rounded-3">
+                          <p class="m-0 p-0">{{
+                            message.content
                           }}</p>
-                        <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
-                          moment(message.sendDate).format('LT') }}</p>
+                          <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
+                            moment(message.sendDate).format('LT') }}</p>
+                          <div class="d-flex gap-1 position-absolute" style="right: 10px;">
+                            <div class="bg-primary-subtle rounded-circle p-1" style="font-size: 12px;"
+                              v-for="emoji in message.reactMessages">
+                              {{ emoji?.reactCode?.description }}
+                            </div>
+                          </div>
+                        </div>
+
                       </div>
                       <div v-else class="px-3 py-2 rounded-3" style="background-color: #95959512;">
                         <Icon icon="material-symbols-light:warning" width="22" height="22" class="text-warning" />
                         message have been remove.
                       </div>
                     </template>
+
                     <div v-if="!message.delete">
                       sent at {{ moment(message.sendDate).calendar() }}
                     </div>
@@ -213,13 +246,27 @@
                       delete at {{ moment(message.sendDate).calendar() }}
                     </div>
                   </BTooltip>
+
+                  <div class="action d-none">
+                    <div class="d-flex gap-2">
+                      <!-- //************ feeling about user  ************* */ -->
+                      <BDropdown variant="dark" no-caret placement="left-start"
+                        toggle-class="bg-transparent text-secondary-emphasis  border-0 same-style-each p-2 rounded-5">
+                        <template #button-content class="bg-transparent ">
+                          <Icon icon="fluent:emoji-add-16-regular" width="26" height="26" />
+                        </template>
+                        <BDropdownItem :active="isHasSelectEmoji(emoji?.code, message.reactMessages)"
+                          @click="() => onReactEmoji(emoji?.code, message?.id)" v-for="emoji in emojis">
+                          <div class="d-flex align-items-center">
+                            <div>{{ emoji.description }} {{ emoji.enName }}</div>
+                          </div>
+                        </BDropdownItem>
+                      </BDropdown>
+                    </div>
+                  </div>
                 </div>
               </div>
-
             </div>
-
-
-
 
           </div>
           <!-- // the place where use to say some and want to contact someone -->
@@ -249,7 +296,7 @@ import { computed, onMounted, ref } from 'vue';
 import { RouteUtil } from '../../utils/RouteUtil';
 import { ApiUtil } from '../../utils/HttpUtil';
 import { useAuthStore } from '../../store/authStore';
-import type { ChatType, LastAccessType, Member, MessageType, TrackUserAccessesType, UserAccessOnlineType } from '../../types/chatType';
+import type { ChatType, LastAccessType, Member, MessageType, ReactMessageType, TrackUserAccessesType, UserAccessOnlineType } from '../../types/chatType';
 import { StringConstant } from '../../constants/stringConstant';
 import moment from 'moment';
 import { ImageUtil } from '../../utils/ImageUtil';
@@ -257,9 +304,12 @@ import { useChatStore } from '../../store/chatStore';
 import { ChatOptionConstant, MessageAction } from '../../constants/valueConstant';
 import { SwalUtil } from '../../utils/swalUtil';
 import type { BaseType } from '../../types/baseType';
+import { useDataRefStore } from '../../store/dataRefStore';
+import type { DataRefType } from '../../types/GlobalType';
 
 const useAuth = useAuthStore();
 const chatStore = useChatStore();
+const dataRefStore = useDataRefStore();
 
 const img = ImageUtil()
 const route = RouteUtil();
@@ -278,10 +328,12 @@ const userActive = ref<UserAccessOnlineType[]>([]);
 const selectedUser = ref<UserAccessOnlineType | any>({} as UserAccessOnlineType);
 const randomImage = ref<string>("");
 const totalUnreadMessageId = ref<number[]>([])
-
-
 const conversations = ref<any>([]);
 const scrollContainer = ref<any>(null);
+
+const emojis = computed<DataRefType[]>(() => {
+  return dataRefStore.data.dataRefs;
+})
 
 const scrollToBottom = () => {
   if (scrollContainer.value) {
@@ -293,7 +345,8 @@ const scrollToBottom = () => {
 };
 
 const getConversation = () => {
-  conversations.value = chatStore.data.conversations.map((chat: ChatType) => {
+  console.log("get chat", chatStore.data.conversations)
+  conversations.value = chatStore.data.conversations.filter(s => s.isActivate == true).map((chat: ChatType) => {
     const chatMessageWith = chat.members.filter((member: Member) => member.user.id != currentUserId.value);
 
     //******** last message id for user select or have select ********/
@@ -307,7 +360,7 @@ const getConversation = () => {
 
     return {
       ...chat,
-      isUnreadMessage: getTotalUnread(chat.id, chatMessageWith.map(member => member.user.id)).length > 0,
+      isUnreadMessage: getTotalUnread(chatMessageWith.map(member => member.user.id)).length > 0,
       me: chat.members.filter((member: Member) => member.user.id == currentUserId.value),
       members: chatMessageWith
     }
@@ -323,10 +376,24 @@ const checkIsShowAvatar = (messages: MessageType[], index: number): boolean => {
   let differenceBottom = messages[index + 1]?.sendBy?.id !== messages[index]?.sendBy?.id;
 
   let differenceTop = messages[index - 1]?.sendBy?.id !== messages[index]?.sendBy?.id;
-  return  theSameTop && differenceBottom || (differenceTop && differenceBottom);
+  return theSameTop && differenceBottom || (differenceTop && differenceBottom);
 }
 
-const getTotalUnread = (chatId: number, sentMessageByUserId: number[]): number[] => {
+const isHasSelectEmoji = (emojiCode: string, reactEmoji: ReactMessageType[]): boolean => {
+  const reactEmojiCodes = reactEmoji.map((val) => val.reactCode.code);
+  //********** mark dropdown to make sure user which have react on emoji ********** */
+  return reactEmojiCodes.includes(emojiCode);
+}
+
+const onReactEmoji = (emojiCode: string, messageId: number) => {
+
+  chatStore.reactMessage(messageId, currentUserId.value, emojiCode, () => {
+    chatStore.getConversationMessage(chatId.value)
+  });
+
+}
+
+const getTotalUnread = (sentMessageByUserId: number[]): number[] => {
   console.log("Yes", messages)
   const clientMessage = messages.value.filter(msg => msg.seenMessages.length == 0 && sentMessageByUserId.includes(msg.sendBy.id)) || [];
   const allMessageId = clientMessage?.map(val => val.id) || [];
@@ -377,6 +444,7 @@ const sendNewMessage = () => {
 }
 
 onMounted(() => {
+  dataRefStore.getDataRefByCode(StringConstant.CODE.EMOJI)
   calculateHeight()
   window.addEventListener('resize', calculateHeight)
 })
@@ -415,10 +483,18 @@ const onSelectChatOption = (option: BaseType) => {
   let description = option.code == StringConstant.BLOCK ? "Do you want to block that user." : "Do you want to remove all message."
   swal.show({
     description: description,
-    confirm: () => {
-      console.log("etst")
-    }
+    confirm: () => optionDeleteMessage(option)
   })
+}
+
+const optionDeleteMessage = (option: BaseType) => {
+  if (StringConstant.BLOCK == option.code) {
+    chatStore.blockMessage(chatId.value, currentUserId.value);
+  }
+  else if (StringConstant.ACTION.DELETE == option.code) {
+    chatStore.deleteChat(chatId.value);
+    loadChat();
+  }
 }
 
 const onSelectMessage = (option: BaseType, messageId: number) => {
@@ -440,15 +516,10 @@ const onSelectedChated = (chat: any, isSeenMessage: boolean) => {
   chatId.value = chat.id;
   const chatInfo = chat.members[0];
 
-  console.log("chatInfo.user.id", chatInfo.user.id)
-  console.log("chat", chat)
-  console.log(isSeenMessage)
   if (isSeenMessage) {
     chat.isUnreadMessage = false;
-    totalUnreadMessageId.value = getTotalUnread(chat.id, [chatInfo.user.id]);
-    console.log("totalUnreadMessageId.value", totalUnreadMessageId.value)
+    totalUnreadMessageId.value = getTotalUnread([chatInfo.user.id]);
     onRequestSeenMessage();
-    // loadChat();
   }
 
   chatStore.getConversationMessage(chatId.value)

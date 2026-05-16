@@ -26,6 +26,11 @@ export const ChatOptionConstant: BaseType[] = [
     name: "Block",
     icon: "streamline:interface-user-block-actions-block-close-denied-deny-geometric-human-person-single-up-user",
   },
+  {
+    code: StringConstant.ACTION.DELETE,
+    name: "Delete",
+    icon: "streamline:interface-block-remove-circle-garbage-trash-delete",
+  },
 ];
 
 export const MessageAction: BaseType[] = [

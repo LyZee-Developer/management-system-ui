@@ -53,6 +53,7 @@
     "clear_chat": "Clear Message",
     "block": "Block",
     "unSend": "unsend",
-    "unsend": "Unsend"
+    "unsend": "Unsend",
+    "delete": "Delete"
   }
 }
