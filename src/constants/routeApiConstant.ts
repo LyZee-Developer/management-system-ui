@@ -9,6 +9,8 @@ export const RouteApi = {
     sendMessage: "api/chat/conversation/send",
     deleteChat: "api/chat/delete",
 
+    clearMessage: "api/chat_message/clear",
+
     //message
     deleteMessage: "api/chat_message/delete",
   },

@@ -17,7 +17,7 @@ export const SettingConstant: BaseType[] = [
 
 export const ChatOptionConstant: BaseType[] = [
   {
-    code: StringConstant.CLEAR_CHAT,
+    code: StringConstant.ACTION.CLEAR,
     name: "Clear Chat",
     icon: "mingcute:brush-3-line",
   },

@@ -2,10 +2,11 @@
   <BContainer fluid class="section-height-message">
     <div class="h-100  grid-middle">
       <!-- // list of users we will be to chat with -->
-      <div lg="2" md="4" sm="5" class="h-100 pb-3 ">
+      <div lg="2" md="4" sm="5" class="h-100 pb-3 overflow-y-auto">
         <BCard class="w-100 h-100 ps-2 rounded-4 overflow-y-auto">
           <BRow>
             <b>{{ $t("system.conversation") }}</b>
+      
           </BRow>
           <div class="d-flex flex-column gap-3 mt-3">
             <BRow class="hover-card" v-if="conversations.length > 0" v-for="conversation in conversations">
@@ -36,6 +37,17 @@
                   <p class="p-0 m-0 text-white" style="font-size: 10px;">{{
                     getTotalUnread(conversation.members.map((member: any) => member.user.id)).length}}
                   </p>
+                </div>
+              </div>
+              <div v-else>
+                <div class="d-flex gap-2 align-items-center"
+                  @click="onSelectedChated(conversation, getTotalUnread([selectedUser.userId]).length > 0)">
+                  <BAvatar size="38">
+                    <Icon icon="twemoji:warning" width="16" height="16" />
+                  </BAvatar>
+                  <div>
+                    <p class="m-0 p-0">Message block</p>
+                  </div>
                 </div>
               </div>
             </BRow>
@@ -124,7 +136,8 @@
 
             <div class="d-flex flex-column gap-2" v-if="messages.length > 0" v-for="(message, index) in messages">
               <!-- //send message to other -->
-              <div class="d-flex justify-content-end" v-if="message.sendBy.id == currentUserId">
+              <div class="d-flex justify-content-end"
+                v-if="message.sendBy.id == currentUserId && ![StringConstant.CODE.CLEAR, StringConstant.CODE.BLOCK].includes(message.type?.code)">
                 <div class="d-flex gap-2  align-items-end position-relative"
                   :class="`${message.delete ? `` : `hover-action`}`">
                   <div class="action d-none">
@@ -207,7 +220,8 @@
               </div>
 
               <!-- receive message from other -->
-              <div class="d-flex gap-2 hover-action align-items-end" v-else>
+              <div class="d-flex gap-2 hover-action align-items-end"
+                v-else-if="message.sendBy.id !== currentUserId && ![StringConstant.CODE.CLEAR, StringConstant.CODE.BLOCK].includes(message.type?.code)">
                 <div class="d-flex gap-2 align-items-end">
                   <BAvatar size="38" v-if="checkIsShowAvatar(messages, index)"
                     :style="{ 'background-color': `${selectedUser.colorName} !important` }">
@@ -266,6 +280,26 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Mark message clear message -->
+              <div v-else-if="message.type?.code == StringConstant.CODE.CLEAR"
+                class="d-flex flex-column justify-content-center align-items-center">
+                <p class="m-0 p-0" style="font-size: 14px; color: #5a5a5a;">{{
+                  message.content
+                  }}</p>
+                <p class="p-0 m-0 " style="font-size: 14px; color: #5a5a5a;">{{ moment(message.sendDate).format('LT') }}
+                </p>
+              </div>
+
+              <!-- Mark message clear message -->
+              <div v-else-if="message.type?.code == StringConstant.CODE.BLOCK"
+                class="d-flex flex-column justify-content-center align-items-center">
+                <p class="m-0 p-0" style="font-size: 14px; color: #5a5a5a;">{{
+                  message.content
+                  }}</p>
+                <p class="p-0 m-0 " style="font-size: 14px; color: #5a5a5a;">{{ moment(message.sendDate).format('LT') }}
+                </p>
+              </div>
             </div>
 
           </div>
@@ -274,7 +308,7 @@
             <BRow class="px-4">
               <BCol lg="12" md="12" sm="12" cols="12">
                 <BInputGroup>
-                  <BFormTextarea v-model="message" @keyup.enter="onSendMessage" @focus="onRequestSeenMessage"
+                  <BFormTextarea v-model="message" :disabled="isDisabledInputMessage"  @keyup.enter="onSendMessage" @focus="onRequestSeenMessage"
                     class="rounded-start-5 padding-textarea" size="sm" rows="1" max-rows="1"
                     placeholder="Say something you here..." />
                   <BInputGroupText class="rounded-end-5 bg-primary text-white" @click="onSendMessage">
@@ -322,6 +356,7 @@ const otherUserLastSeenMessageId = ref<number>(0);
 const topRef = ref<HTMLElement | null>(null)
 const bottomRef = ref<HTMLElement | null>(null)
 const isCreateChat = ref<boolean>(false);
+const isDisabledInputMessage = ref<boolean>(false);
 const middleHeight = ref(100)
 const message = ref<string>("");
 const userActive = ref<UserAccessOnlineType[]>([]);
@@ -368,6 +403,7 @@ const getConversation = () => {
 }
 
 const messages = computed(() => {
+  isDisabledInputMessage.value = chatStore.data.messages.some(s => s?.type?.code == StringConstant.CODE.BLOCK) || false;
   return chatStore.data.messages;
 })
 
@@ -428,7 +464,8 @@ const onSendMessage = () => {
 }
 
 const createChat = () => {
-  chatStore.startChat(currentUserId.value, selectedUser.value.userId, message.value, () => {
+  chatStore.startChat(currentUserId.value, selectedUser.value.userId, message.value, (id: number) => {
+    chatStore.getConversationMessage(id);
     loadChat();
   })
 }
@@ -494,6 +531,11 @@ const optionDeleteMessage = (option: BaseType) => {
   else if (StringConstant.ACTION.DELETE == option.code) {
     chatStore.deleteChat(chatId.value);
     loadChat();
+  }
+  else if (StringConstant.ACTION.CLEAR == option.code) {
+    chatStore.removeAllMessage(chatId.value, currentUserId.value, () => {
+      chatStore.getConversationMessage(chatId.value);
+    });
   }
 }
 

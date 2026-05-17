@@ -54,6 +54,7 @@
     "block": "Block",
     "unSend": "unsend",
     "unsend": "Unsend",
-    "delete": "Delete"
+    "delete": "Delete",
+    "clear": "Clear"
   }
 }

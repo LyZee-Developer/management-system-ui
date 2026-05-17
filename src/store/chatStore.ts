@@ -131,13 +131,31 @@ export const useChatStore = defineStore("chatStore", () => {
     fn?.();
   };
 
+  const removeAllMessage = async (
+    chatId: number,
+    clearById: number,
+    fn?: () => void,
+  ) => {
+    console.log("seen");
+    const res: any = await api.https({
+      url: `${RouteApi.chat.clearMessage}`,
+      data: {
+        chatId: chatId,
+        userId: clearById,
+      },
+      method: StringConstant.POST,
+    });
+    console.log("message", res?.data);
+    fn?.();
+  };
+
   const startChat = async (
     senderId: number,
     receiverId: number,
     message: string,
-    fn?: () => void,
+    fn?: (id:number) => void,
   ) => {
-    const res = await api.https({
+    const res:any = await api.https({
       url: RouteApi.chat.create,
       data: {
         sendBy: senderId,
@@ -147,7 +165,7 @@ export const useChatStore = defineStore("chatStore", () => {
       method: StringConstant.POST,
     });
     console.log(res);
-    fn?.();
+    fn?.(res.data || 0);
   };
 
   const clearMessage = () => {
@@ -165,6 +183,7 @@ export const useChatStore = defineStore("chatStore", () => {
     seenMessage,
     deleteChat,
     deleteMessage,
+    removeAllMessage,
     clearMessage,
   };
 });

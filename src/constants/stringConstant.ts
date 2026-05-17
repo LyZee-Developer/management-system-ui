@@ -43,9 +43,12 @@ export const StringConstant = {
     DELETE: "delete",
     CREATE: "create",
     UPDATE: "update",
+    CLEAR: "clear",
   },
   
   CODE: {
     EMOJI: "EMOJI",
+    CLEAR : "CLEAR",
+    BLOCK : "BLOCK"
   },
 };
