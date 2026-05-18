@@ -6,15 +6,18 @@
         <BCard class="w-100 h-100 ps-2 rounded-4 overflow-y-auto">
           <BRow>
             <b>{{ $t("system.conversation") }}</b>
-      
+
           </BRow>
           <div class="d-flex flex-column gap-3 mt-3">
             <BRow class="hover-card" v-if="conversations.length > 0" v-for="conversation in conversations">
-              <div class="d-flex gap-2 justify-content-between align-items-center"
+              <div class="d-flex gap-2 position-relative justify-content-between align-items-center"
                 v-if="conversation.members.length == 1" @click="() => {
                   conversation.isUnreadMessage = false;
                   onSelectedChated(conversation, getTotalUnread([selectedUser.userId]).length > 0)
                 }">
+                <div class="position-absolute bg-primary " :class="`${selectedUser.userId == conversation.members[0].user.id ? `active`:``}`" >
+
+                </div>
                 <div class="d-flex gap-2">
                   <BAvatar size="38" :style="{ 'background-color': `${conversation.members[0].user.hex} !important` }">
                     {{ conversation.members[0].user.name.slice(0, 1) }}
@@ -87,12 +90,20 @@
           <div class="px-2 border-bottom">
             <div class="d-flex justify-content-between py-3 ps-2">
               <div class="d-flex gap-2">
-                <BAvatar size="38" :style="{ 'background-color': `${selectedUser.colorName} !important` }">
+                <BAvatar size="38" v-if="!isChatHasBlock"
+                  :style="{ 'background-color': `${selectedUser.colorName} !important` }">
                   {{ selectedUser.username?.slice(0, 1) ?? "" }}
                 </BAvatar>
-                <div>
-                  <p class="m-0 p-0">{{ selectedUser?.username || "Anonymous" }}</p>
-                  <div class="d-flex gap-2">
+
+                <BAvatar v-else size="38">
+                  <Icon icon="twemoji:warning" width="16" height="16" />
+                </BAvatar>
+                <div :class="`${isChatHasBlock ? `d-flex align-items-center` : ``}`">
+
+                  <p class="m-0 p-0" v-if="!isChatHasBlock">{{ selectedUser?.username || "Anonymous" }}</p>
+                  <!-- //***************Info user block ***************-->
+                  <p v-else class="m-0 p-0">Block Message</p>
+                  <div class="d-flex gap-2" v-if="!isChatHasBlock">
                     <p class="p-0 m-0 text-success" style="font-size: 12px;"
                       v-if="selectedUser.lastAccess?.type == StringConstant.OPEN">online</p>
                     <p class="p-0 m-0 text-secondary" style="font-size: 12px;"
@@ -105,12 +116,12 @@
                 </div>
               </div>
 
-              <BDropdown variant="dark" no-caret
+              <BDropdown variant="dark" no-caret v-if="!isCreateChat"
                 toggle-class="bg-transparent text-secondary-emphasis border-0 same-style-each p-2 rounded-5">
                 <template #button-content class="bg-transparent ">
                   <Icon icon="proicons:more" width="26" height="26" />
                 </template>
-                <BDropdownItem @click="() => onSelectChatOption(item)" v-for="item in ChatOptionConstant">
+                <BDropdownItem @click="() => onSelectChatOption(item)" v-for="item in chatOptions">
                   <div class="d-flex align-items-center">
                     <BAvatar size="35" class="bg-transparent">
                       <Icon :icon="item.icon!" class="text-secondary-emphasis" width="301" height="193" />
@@ -180,7 +191,7 @@
                         v-if="!message.delete">
                         <p class="m-0 p-0">{{
                           message.content
-                        }}</p>
+                          }}</p>
                         <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
                           moment(message.sendDate).format('LT') }}</p>
                         <div class="d-flex gap-1 position-absolute" style="right: 10px; bottom: -13px;">
@@ -235,10 +246,10 @@
                         <div class="bg-secondary-subtle mb-2 position-relative  px-3 py-2 rounded-3">
                           <p class="m-0 p-0">{{
                             message.content
-                          }}</p>
+                            }}</p>
                           <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
                             moment(message.sendDate).format('LT') }}</p>
-                          <div class="d-flex gap-1 position-absolute" style="right: 10px;">
+                          <div class="d-flex gap-1 position-absolute" style="left: 10px;">
                             <div class="bg-primary-subtle rounded-circle p-1" style="font-size: 12px;"
                               v-for="emoji in message.reactMessages">
                               {{ emoji?.reactCode?.description }}
@@ -286,7 +297,7 @@
                 class="d-flex flex-column justify-content-center align-items-center">
                 <p class="m-0 p-0" style="font-size: 14px; color: #5a5a5a;">{{
                   message.content
-                  }}</p>
+                }}</p>
                 <p class="p-0 m-0 " style="font-size: 14px; color: #5a5a5a;">{{ moment(message.sendDate).format('LT') }}
                 </p>
               </div>
@@ -296,7 +307,7 @@
                 class="d-flex flex-column justify-content-center align-items-center">
                 <p class="m-0 p-0" style="font-size: 14px; color: #5a5a5a;">{{
                   message.content
-                  }}</p>
+                }}</p>
                 <p class="p-0 m-0 " style="font-size: 14px; color: #5a5a5a;">{{ moment(message.sendDate).format('LT') }}
                 </p>
               </div>
@@ -308,9 +319,9 @@
             <BRow class="px-4">
               <BCol lg="12" md="12" sm="12" cols="12">
                 <BInputGroup>
-                  <BFormTextarea v-model="message" :disabled="isDisabledInputMessage"  @keyup.enter="onSendMessage" @focus="onRequestSeenMessage"
-                    class="rounded-start-5 padding-textarea" size="sm" rows="1" max-rows="1"
-                    placeholder="Say something you here..." />
+                  <BFormTextarea v-model="message" :disabled="isDisabledInputMessage" @keyup.enter="onSendMessage"
+                    @focus="onRequestSeenMessage" class="rounded-start-5 padding-textarea" size="sm" rows="1"
+                    max-rows="1" placeholder="Say something you here..." />
                   <BInputGroupText class="rounded-end-5 bg-primary text-white" @click="onSendMessage">
                     <Icon icon="ri:send-ins-line" width="24" height="24" /><span class="ms-2">Send</span>
                   </BInputGroupText>
@@ -335,7 +346,7 @@ import { StringConstant } from '../../constants/stringConstant';
 import moment from 'moment';
 import { ImageUtil } from '../../utils/ImageUtil';
 import { useChatStore } from '../../store/chatStore';
-import { ChatOptionConstant, MessageAction } from '../../constants/valueConstant';
+import { ChatOptionConstant, getChatOption, MessageAction } from '../../constants/valueConstant';
 import { SwalUtil } from '../../utils/swalUtil';
 import type { BaseType } from '../../types/baseType';
 import { useDataRefStore } from '../../store/dataRefStore';
@@ -357,12 +368,16 @@ const topRef = ref<HTMLElement | null>(null)
 const bottomRef = ref<HTMLElement | null>(null)
 const isCreateChat = ref<boolean>(false);
 const isDisabledInputMessage = ref<boolean>(false);
+const isChatHasBlock = ref<boolean>(false);
+const isSelectChat = ref<boolean>(false);
+const isSelectNewAfterBlock = ref<boolean>(false);
 const middleHeight = ref(100)
 const message = ref<string>("");
 const userActive = ref<UserAccessOnlineType[]>([]);
 const selectedUser = ref<UserAccessOnlineType | any>({} as UserAccessOnlineType);
 const randomImage = ref<string>("");
 const totalUnreadMessageId = ref<number[]>([])
+const chatOptions = ref<BaseType[]>([]);
 const conversations = ref<any>([]);
 const scrollContainer = ref<any>(null);
 
@@ -404,8 +419,17 @@ const getConversation = () => {
 
 const messages = computed(() => {
   isDisabledInputMessage.value = chatStore.data.messages.some(s => s?.type?.code == StringConstant.CODE.BLOCK) || false;
+  isChatHasBlock.value = isDisabledInputMessage.value;
+
+  let isHasBlock = isDisabledInputMessage.value;
+  getOptions(isHasBlock)
+
   return chatStore.data.messages;
 })
+
+const getOptions = (isHasBlock: boolean) => {
+  chatOptions.value = getChatOption(isHasBlock);
+}
 
 const checkIsShowAvatar = (messages: MessageType[], index: number): boolean => {
   let theSameTop = messages[index - 1]?.sendBy?.id === messages[index]?.sendBy?.id;
@@ -502,12 +526,16 @@ const getListUserOnline = async () => {
 
   let chatAlready = conversations.value.map((s: ChatType) => s.members.map((mem: Member) => mem.user.id)).flat();
   userActive.value = data?.data?.content.filter((user: UserAccessOnlineType) => user.username != useAuth.data.accountInfo.name && !chatAlready.includes(user.userId));
+  if (isSelectNewAfterBlock.value || isSelectChat.value) {
+    selectedUser.value = userActive.value?.[0];
+  }
 }
 
 const onSelectedUser = (user: UserAccessOnlineType) => {
   selectedUser.value = user;
   randomImage.value = img.randomImage();
   isCreateChat.value = true;
+  isSelectNewAfterBlock.value = false;
   clearMessage();
 }
 
@@ -527,9 +555,14 @@ const onSelectChatOption = (option: BaseType) => {
 const optionDeleteMessage = (option: BaseType) => {
   if (StringConstant.BLOCK == option.code) {
     chatStore.blockMessage(chatId.value, currentUserId.value);
+    chatStore.clearMessage();
+    isSelectNewAfterBlock.value = true;
+    loadChat();
   }
   else if (StringConstant.ACTION.DELETE == option.code) {
     chatStore.deleteChat(chatId.value);
+    isSelectChat.value = true;
+    clearMessage();
     loadChat();
   }
   else if (StringConstant.ACTION.CLEAR == option.code) {
@@ -558,19 +591,21 @@ const onSelectedChated = (chat: any, isSeenMessage: boolean) => {
   chatId.value = chat.id;
   const chatInfo = chat.members[0];
 
+  isSelectNewAfterBlock.value = false;
+
   if (isSeenMessage) {
     chat.isUnreadMessage = false;
-    totalUnreadMessageId.value = getTotalUnread([chatInfo.user.id]);
+    totalUnreadMessageId.value = getTotalUnread([chatInfo?.user?.id]);
     onRequestSeenMessage();
   }
 
   chatStore.getConversationMessage(chatId.value)
   let select: any = {
-    colorName: chatInfo.user.hex,
-    lastAccess: chatInfo.user.userLogin.TrackUserAccesses.length > 0 ? chatInfo.user.userLogin.TrackUserAccesses[0] : {} as LastAccessType,
-    username: chatInfo.user.name,
-    userId: chatInfo.user.id,
-    lastSeenMessageId: chatInfo.lastSeenMessageId,
+    colorName: chatInfo?.user?.hex,
+    lastAccess: chatInfo?.user?.userLogin?.TrackUserAccesses?.length > 0 ? chatInfo?.user?.userLogin?.TrackUserAccesses[0] : {} as LastAccessType,
+    username: chatInfo?.user?.name,
+    userId: chatInfo?.user?.id,
+    lastSeenMessageId: chatInfo?.lastSeenMessageId,
   }
 
   selectedUser.value = { ...select, chatId: chatId.value };
@@ -661,5 +696,12 @@ onMounted(() => {
   position: absolute;
   right: -25px;
   bottom: 7px;
+}
+
+.active{
+  width: 4px;
+  height: 50%;
+  left: 0px;
+  border-radius: 2px;
 }
 </style>

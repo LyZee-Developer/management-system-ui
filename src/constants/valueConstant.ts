@@ -14,7 +14,6 @@ export const SettingConstant: BaseType[] = [
   },
 ];
 
-
 export const ChatOptionConstant: BaseType[] = [
   {
     code: StringConstant.ACTION.CLEAR,
@@ -32,6 +31,16 @@ export const ChatOptionConstant: BaseType[] = [
     icon: "streamline:interface-block-remove-circle-garbage-trash-delete",
   },
 ];
+
+export const getChatOption = (isBlock: boolean): BaseType[] => {
+  let option: BaseType[] = ChatOptionConstant;
+  if (isBlock) {
+    option = ChatOptionConstant.filter(
+      (opt) => opt.code == StringConstant.ACTION.DELETE,
+    );
+  }
+  return option;
+};
 
 export const MessageAction: BaseType[] = [
   {
