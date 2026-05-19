@@ -15,7 +15,8 @@
                   conversation.isUnreadMessage = false;
                   onSelectedChated(conversation, getTotalUnread([selectedUser.userId]).length > 0)
                 }">
-                <div class="position-absolute bg-primary " :class="`${selectedUser.userId == conversation.members[0].user.id ? `active`:``}`" >
+                <div class="position-absolute bg-primary "
+                  :class="`${selectedUser.userId == conversation.members[0].user.id ? `active` : ``}`">
 
                 </div>
                 <div class="d-flex gap-2">
@@ -65,7 +66,10 @@
           </BRow>
           <div class="d-flex flex-column gap-3 mt-3">
             <BRow class="hover-card" v-for="user in userActive" @click="() => onSelectedUser(user)">
-              <div class=" d-flex gap-2">
+              <div class=" d-flex gap-2 position-relative align-items-center">
+                <div class="position-absolute bg-primary "
+                  :class="`${selectedUser.userId == user.userId ? `active` : ``}`">
+                </div>
                 <BAvatar size="38" :style="{ 'background-color': `${user.colorName} !important` }">
                   {{ user.username.slice(0, 1) }}
                 </BAvatar>
@@ -188,7 +192,7 @@
                     <template #target>
                       <div
                         class="bg-secondary-subtle d-flex flex-column position-relative align-items-end px-3 py-2 rounded-3"
-                        v-if="!message.delete">
+                        :class="message.reactMessages.length > 0 ? ` margin-bottom ` : ``" v-if="!message.delete">
                         <p class="m-0 p-0">{{
                           message.content
                           }}</p>
@@ -243,7 +247,8 @@
                   <BTooltip>
                     <template #target>
                       <div v-if="!message.delete">
-                        <div class="bg-secondary-subtle mb-2 position-relative  px-3 py-2 rounded-3">
+                        <div class="bg-secondary-subtle mb-2 position-relative  px-3 py-2 rounded-3"
+                          :class="message.reactMessages.length > 0 ? ` margin-bottom ` : ``">
                           <p class="m-0 p-0">{{
                             message.content
                             }}</p>
@@ -662,6 +667,10 @@ onMounted(() => {
   height: calc(100vh - 150px);
 }
 
+.margin-bottom {
+  margin-bottom: 11px !important;
+}
+
 .shape-circle {
   width: 40px;
   height: 40px;
@@ -698,7 +707,7 @@ onMounted(() => {
   bottom: 7px;
 }
 
-.active{
+.active {
   width: 4px;
   height: 50%;
   left: 0px;

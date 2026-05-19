@@ -12,45 +12,61 @@ const input = ref('')
 let client: Client
 
 onMounted(() => {
+
   client = new Client({
-    brokerURL: 'http://localhost:6780/ws', // ✅ direct WebSocket
+    // PURE WEBSOCKET
+    brokerURL: 'ws://localhost:6780/ws',
     reconnectDelay: 5000,
     debug: (str) => {
-      console.log("dubug =>",str)
-    },
+      console.log(str)
+    }
   })
 
   client.onConnect = () => {
-    console.log('we are Connected')
-
-    client.subscribe('/topic/messages', (msg) => {
-      console.log("we got message from subscribe ",msg)
-      messages.value.push(msg.body)
+    console.log('CONNECTED')
+    client.subscribe('/topic/public', (message) => {
+      console.log('MESSAGE =>', message.body)
+      messages.value.push(message.body)
     })
+  }
+
+  client.onStompError = (frame) => {
+    console.error('STOMP ERROR', frame)
+  }
+
+  client.onWebSocketClose = (event) => {
+    console.log('SOCKET CLOSED', event)
+  }
+
+  client.onWebSocketError = (event) => {
+    console.log('SOCKET ERROR', event)
   }
 
   client.activate()
 })
 
 onBeforeUnmount(() => {
-  if (client) client.deactivate()
+  if (client) {
+    client.deactivate()
+  }
 })
 
+
 const sendMessage = () => {
-  console.log("datat Input",input.value)
   if (!input.value.trim()) return
-  console.log("work")
   if (!client || !client.connected) {
     console.log('WebSocket not connected yet')
     return
   }
-
+  console.log("send")
   client.publish({
-    destination: '/app/send',
-    body: JSON.stringify({
-      sender: 'User',
-      content: input.value
-    })
+    destination: '/app/sendMessage',
+    body: input.value
+    //*******send as object */
+    // body: JSON.stringify({
+    //   sender: 'User',
+    //   content: input.value
+    // })
   })
 
   input.value = ''
@@ -58,7 +74,7 @@ const sendMessage = () => {
 </script>
 
 <template>
-  <div class="max-w-xl mx-auto mt-10 p-4 border rounded-xl shadow bg-white">
+  <div class="max-w-xl text-black mx-auto mt-10 p-4 border rounded-xl shadow bg-white">
 
     <h2 class="text-xl font-bold mb-4">WebSocket Chat</h2>
 
