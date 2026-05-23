@@ -14,6 +14,7 @@ export interface LastAccessType {
 export interface Member {
   dateJoin: string;
   id: number;
+  unread: number;
   lastSeenMessageId: number;
   user: UserInfoType;
 }

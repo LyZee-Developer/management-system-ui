@@ -50,11 +50,13 @@ export const useChatStore = defineStore("chatStore", () => {
     messageId: number,
     reactById: number,
     emojiCode: string,
+    chatId: number,
     fn?: () => void,
   ) => {
     const res: any = await api.https({
       url: RouteApi.chat.reactMessage,
       data: {
+        chatId: chatId,
         messageId: messageId,
         reactById: reactById,
         emojiCode: emojiCode,
@@ -86,12 +88,15 @@ export const useChatStore = defineStore("chatStore", () => {
 
   const getConversationMessage = async (chatId: number, fn?: () => void) => {
     const res: any = await api.https({
-      url: `${RouteApi.chat.conversation}/${chatId}`,
-      data: {},
-      method: StringConstant.GET,
+      url: `${RouteApi.chat.conversation}`,
+      data: {
+        id: chatId,
+      },
+      method: StringConstant.POST,
     });
-    console.log("message", res?.data);
-    data.messages = res?.data ?? [];
+    console.log("message", res?.data?.content ?? []);
+    //************ sort id from small to big ************* */
+    data.messages = res?.data?.content.sort((a:MessageType, b:MessageType) => a.id - b.id) ?? [];
     fn?.();
   };
 
@@ -116,6 +121,7 @@ export const useChatStore = defineStore("chatStore", () => {
   const seenMessage = async (
     lastMessageId: number,
     seenById: number,
+    chatId: number,
     fn?: () => void,
   ) => {
     console.log("seen");
@@ -123,6 +129,7 @@ export const useChatStore = defineStore("chatStore", () => {
       url: `${RouteApi.chat.seenMessage}`,
       data: {
         userId: seenById,
+        id: chatId,
         messageId: lastMessageId,
       },
       method: StringConstant.POST,
@@ -153,9 +160,9 @@ export const useChatStore = defineStore("chatStore", () => {
     senderId: number,
     receiverId: number,
     message: string,
-    fn?: (id:number) => void,
+    fn?: (id: number) => void,
   ) => {
-    const res:any = await api.https({
+    const res: any = await api.https({
       url: RouteApi.chat.create,
       data: {
         sendBy: senderId,

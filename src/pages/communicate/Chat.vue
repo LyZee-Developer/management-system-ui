@@ -15,6 +15,7 @@
                   conversation.isUnreadMessage = false;
                   onSelectedChated(conversation, getTotalUnread([selectedUser.userId]).length > 0)
                 }">
+
                 <div class="position-absolute bg-primary "
                   :class="`${selectedUser.userId == conversation.members[0].user.id ? `active` : ``}`">
 
@@ -35,11 +36,12 @@
 
                 <!-- //*********** did not read message */ -->
                 <!-- && conversation.members[0].user?.id !== selectedUser.userId -->
-                <div v-if="conversation.isUnreadMessage"
+                <div v-if="conversation.members[0].unread > 0 && conversation.members[0].user?.id !== selectedUser.userId"
                   class="rounded-5 bg-success d-flex justify-content-center align-items-center"
                   style="width: 20px; height: 20px;">
                   <p class="p-0 m-0 text-white" style="font-size: 10px;">{{
-                    getTotalUnread(conversation.members.map((member: any) => member.user.id)).length}}
+                    conversation.members[0].unread
+                  }}
                   </p>
                 </div>
               </div>
@@ -148,7 +150,6 @@
               <img :src="randomImage" style="width: 150px;" />
               <div>Make your day with me {{ useAuth.data.accountInfo.name }}?</div>
             </div>
-
             <div class="d-flex flex-column gap-2" v-if="messages.length > 0" v-for="(message, index) in messages">
               <!-- //send message to other -->
               <div class="d-flex justify-content-end"
@@ -195,7 +196,7 @@
                         :class="message.reactMessages.length > 0 ? ` margin-bottom ` : ``" v-if="!message.delete">
                         <p class="m-0 p-0">{{
                           message.content
-                          }}</p>
+                        }}</p>
                         <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
                           moment(message.sendDate).format('LT') }}</p>
                         <div class="d-flex gap-1 position-absolute" style="right: 10px; bottom: -13px;">
@@ -217,12 +218,14 @@
                       delete at {{ moment(message.sendDate).calendar() }}
                     </div>
                   </BTooltip>
-                  <BAvatar size="38" v-if="checkIsShowAvatar(messages, index)"
+                  <!-- <BAvatar size="38" v-if="checkIsShowAvatar(messages, index)"
                     :style="{ 'background-color': `${useAuth.data.accountInfo.hex} !important` }">
                     {{ useAuth.data.accountInfo.name?.slice(0, 1) }}
                   </BAvatar>
                   <div v-else style="margin-right: 36px;">
-                  </div>
+                  </div> -->
+                  {{ otherUserLastSeenMessageId ?? "emtpy" }}
+                  {{ message.id }}
 
                   <!-- //********** Mark user has saw the message ********* */ -->
                   <div class="other-seen-message d-flex justify-content-center align-items-center"
@@ -247,14 +250,14 @@
                   <BTooltip>
                     <template #target>
                       <div v-if="!message.delete">
-                        <div class="bg-secondary-subtle mb-2 position-relative  px-3 py-2 rounded-3"
+                        <div class="bg-secondary-subtle position-relative  px-3 py-2 rounded-3"
                           :class="message.reactMessages.length > 0 ? ` margin-bottom ` : ``">
                           <p class="m-0 p-0">{{
                             message.content
-                            }}</p>
+                          }}</p>
                           <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
                             moment(message.sendDate).format('LT') }}</p>
-                          <div class="d-flex gap-1 position-absolute" style="left: 10px;">
+                          <div class="d-flex gap-1 position-absolute" style="left: 10px; bottom: -13px;">
                             <div class="bg-primary-subtle rounded-circle p-1" style="font-size: 12px;"
                               v-for="emoji in message.reactMessages">
                               {{ emoji?.reactCode?.description }}
@@ -302,7 +305,7 @@
                 class="d-flex flex-column justify-content-center align-items-center">
                 <p class="m-0 p-0" style="font-size: 14px; color: #5a5a5a;">{{
                   message.content
-                }}</p>
+                  }}</p>
                 <p class="p-0 m-0 " style="font-size: 14px; color: #5a5a5a;">{{ moment(message.sendDate).format('LT') }}
                 </p>
               </div>
@@ -312,7 +315,7 @@
                 class="d-flex flex-column justify-content-center align-items-center">
                 <p class="m-0 p-0" style="font-size: 14px; color: #5a5a5a;">{{
                   message.content
-                }}</p>
+                  }}</p>
                 <p class="p-0 m-0 " style="font-size: 14px; color: #5a5a5a;">{{ moment(message.sendDate).format('LT') }}
                 </p>
               </div>
@@ -342,7 +345,7 @@
 <script lang="ts" setup>
 import { BAvatar, BCard, BCol, BContainer, BDropdown, BDropdownItem, BFormTextarea, BInputGroup, BInputGroupText, BRow, BTooltip } from 'bootstrap-vue-next';
 import { Icon } from '@iconify/vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { RouteUtil } from '../../utils/RouteUtil';
 import { ApiUtil } from '../../utils/HttpUtil';
 import { useAuthStore } from '../../store/authStore';
@@ -351,11 +354,12 @@ import { StringConstant } from '../../constants/stringConstant';
 import moment from 'moment';
 import { ImageUtil } from '../../utils/ImageUtil';
 import { useChatStore } from '../../store/chatStore';
-import { ChatOptionConstant, getChatOption, MessageAction } from '../../constants/valueConstant';
+import { getChatOption, MessageAction } from '../../constants/valueConstant';
 import { SwalUtil } from '../../utils/swalUtil';
 import type { BaseType } from '../../types/baseType';
 import { useDataRefStore } from '../../store/dataRefStore';
 import type { DataRefType } from '../../types/GlobalType';
+import { Client } from '@stomp/stompjs';
 
 const useAuth = useAuthStore();
 const chatStore = useChatStore();
@@ -390,17 +394,62 @@ const emojis = computed<DataRefType[]>(() => {
   return dataRefStore.data.dataRefs;
 })
 
+let client: Client
+
+onMounted(() => {
+
+  client = new Client({
+    brokerURL: 'ws://localhost:6780/ws',
+    reconnectDelay: 5000,
+    debug: (str) => {
+      console.log(str)
+    }
+  })
+
+  client.onConnect = () => {
+    client.subscribe(`/topic/conversation`, async (result) => {
+      const chat: number = parseInt(result.body);
+      if (chat == chatId.value) {
+        getMessageWithRealTime(chat)
+      } else {
+        loadConversationAndUserOnline();
+      }
+
+    })
+
+    client.subscribe(`/topic/conversation`, async (result) => {
+      console.log("yes loca")
+      loadChat();
+    })
+  }
+
+  client.activate()
+})
+
+const getMessageWithRealTime = async (chatId: number) => {
+  await chatStore.getConversationMessage(chatId, () => {
+    scrollToBottom();
+  });
+}
+
+onBeforeUnmount(() => {
+  if (client) {
+    client.deactivate()
+  }
+})
+
 const scrollToBottom = () => {
   if (scrollContainer.value) {
-    scrollContainer.value.scrollTo({
-      top: scrollContainer.value.scrollHeight + 100,
-      behavior: 'smooth' // For animated scrolling
-    });
+    setTimeout(() => {
+      scrollContainer.value.scrollTo({
+        top: scrollContainer.value.scrollHeight + 100,
+        behavior: 'smooth' // For animated scrolling
+      });
+    }, 500)
   }
 };
 
 const getConversation = () => {
-  console.log("get chat", chatStore.data.conversations)
   conversations.value = chatStore.data.conversations.filter(s => s.isActivate == true).map((chat: ChatType) => {
     const chatMessageWith = chat.members.filter((member: Member) => member.user.id != currentUserId.value);
 
@@ -452,14 +501,14 @@ const isHasSelectEmoji = (emojiCode: string, reactEmoji: ReactMessageType[]): bo
 
 const onReactEmoji = (emojiCode: string, messageId: number) => {
 
-  chatStore.reactMessage(messageId, currentUserId.value, emojiCode, () => {
+  chatStore.reactMessage(messageId, currentUserId.value, emojiCode, chatId.value, () => {
     chatStore.getConversationMessage(chatId.value)
   });
 
 }
 
 const getTotalUnread = (sentMessageByUserId: number[]): number[] => {
-  console.log("Yes", messages)
+  console.log("Yes", messages.value)
   const clientMessage = messages.value.filter(msg => msg.seenMessages.length == 0 && sentMessageByUserId.includes(msg.sendBy.id)) || [];
   const allMessageId = clientMessage?.map(val => val.id) || [];
   return allMessageId;
@@ -471,7 +520,7 @@ const onRequestSeenMessage = () => {
     let total = totalUnreadMessageId.value.length;
     for (let id = 0; id < total; id++) {
       setTimeout(async () => {
-        await chatStore.seenMessage(totalUnreadMessageId.value[id], currentUserId.value)
+        await chatStore.seenMessage(totalUnreadMessageId.value[id], currentUserId.value, chatId.value)
       }, (id + 1) * 500);
     }
   }
@@ -500,13 +549,7 @@ const createChat = () => {
 }
 
 const sendNewMessage = () => {
-  chatStore.sendMessage(chatId.value, currentUserId.value, message.value, () => {
-    chatStore.getConversationMessage(chatId.value, () => {
-      setTimeout(() => {
-        scrollToBottom();
-      }, 500)
-    });
-  })
+  chatStore.sendMessage(chatId.value, currentUserId.value, message.value)
 }
 
 onMounted(() => {
@@ -596,6 +639,8 @@ const onSelectedChated = (chat: any, isSeenMessage: boolean) => {
   chatId.value = chat.id;
   const chatInfo = chat.members[0];
 
+  //********* clear unread ******** */
+  chatInfo.unread = 0;
   isSelectNewAfterBlock.value = false;
 
   if (isSeenMessage) {
@@ -615,9 +660,7 @@ const onSelectedChated = (chat: any, isSeenMessage: boolean) => {
 
   selectedUser.value = { ...select, chatId: chatId.value };
   localStorage.setItem(StringConstant.SELECT_USER, JSON.stringify(selectedUser.value));
-  setTimeout(() => {
-    scrollToBottom();
-  }, 1000)
+  scrollToBottom();
 }
 
 const loadChat = () => {
@@ -626,6 +669,11 @@ const loadChat = () => {
     getConversation();
     scrollToBottom();
   });
+}
+
+const loadConversationAndUserOnline = () => {
+  getListUserOnline();
+  getConversation();
 }
 
 const checkToGetMessage = () => {

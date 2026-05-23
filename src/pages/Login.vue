@@ -293,7 +293,7 @@ const createNewAccount = async (isRegister: boolean) => {
         const response = await axios.post(url, send)
         if (response.data.status == StringConstant.SUCCESS) {
 
-            let userLoginId = isRegister ? response.data?.data ?? 0 : response.data?.data?.id;
+            let userLoginId = isRegister ? response.data?.data ?? 0 : response.data?.data?.userInfo?.id;
             let isSuccess = userLoginId > 0;
             let message = isRegister ? isSuccess ? `Register account successfully!` : `Login fail!` : "Welcome to our system M-A-S 🎉🎉";
             console.log(message)
