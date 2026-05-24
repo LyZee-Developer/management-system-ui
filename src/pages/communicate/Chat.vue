@@ -12,8 +12,7 @@
             <BRow class="hover-card" v-if="conversations.length > 0" v-for="conversation in conversations">
               <div class="d-flex gap-2 position-relative justify-content-between align-items-center"
                 v-if="conversation.members.length == 1" @click="() => {
-                  conversation.isUnreadMessage = false;
-                  onSelectedChated(conversation, getTotalUnread([selectedUser.userId]).length > 0)
+                  onSelectedChated(conversation)
                 }">
 
                 <div class="position-absolute bg-primary "
@@ -36,7 +35,8 @@
 
                 <!-- //*********** did not read message */ -->
                 <!-- && conversation.members[0].user?.id !== selectedUser.userId -->
-                <div v-if="conversation.members[0].unread > 0 && conversation.members[0].user?.id !== selectedUser.userId"
+                <div
+                  v-if="conversation.members[0].unread > 0 && conversation.members[0].user?.id !== selectedUser.userId"
                   class="rounded-5 bg-success d-flex justify-content-center align-items-center"
                   style="width: 20px; height: 20px;">
                   <p class="p-0 m-0 text-white" style="font-size: 10px;">{{
@@ -46,8 +46,7 @@
                 </div>
               </div>
               <div v-else>
-                <div class="d-flex gap-2 align-items-center"
-                  @click="onSelectedChated(conversation, getTotalUnread([selectedUser.userId]).length > 0)">
+                <div class="d-flex gap-2 align-items-center" @click="onSelectedChated(conversation)">
                   <BAvatar size="38">
                     <Icon icon="twemoji:warning" width="16" height="16" />
                   </BAvatar>
@@ -218,14 +217,6 @@
                       delete at {{ moment(message.sendDate).calendar() }}
                     </div>
                   </BTooltip>
-                  <!-- <BAvatar size="38" v-if="checkIsShowAvatar(messages, index)"
-                    :style="{ 'background-color': `${useAuth.data.accountInfo.hex} !important` }">
-                    {{ useAuth.data.accountInfo.name?.slice(0, 1) }}
-                  </BAvatar>
-                  <div v-else style="margin-right: 36px;">
-                  </div> -->
-                  {{ otherUserLastSeenMessageId ?? "emtpy" }}
-                  {{ message.id }}
 
                   <!-- //********** Mark user has saw the message ********* */ -->
                   <div class="other-seen-message d-flex justify-content-center align-items-center"
@@ -328,8 +319,8 @@
               <BCol lg="12" md="12" sm="12" cols="12">
                 <BInputGroup>
                   <BFormTextarea v-model="message" :disabled="isDisabledInputMessage" @keyup.enter="onSendMessage"
-                    @focus="onRequestSeenMessage" class="rounded-start-5 padding-textarea" size="sm" rows="1"
-                    max-rows="1" placeholder="Say something you here..." />
+                    @focus="seenMessage" class="rounded-start-5 padding-textarea" size="sm" rows="1" max-rows="1"
+                    placeholder="Say something you here..." />
                   <BInputGroupText class="rounded-end-5 bg-primary text-white" @click="onSendMessage">
                     <Icon icon="ri:send-ins-line" width="24" height="24" /><span class="ms-2">Send</span>
                   </BInputGroupText>
@@ -385,10 +376,10 @@ const message = ref<string>("");
 const userActive = ref<UserAccessOnlineType[]>([]);
 const selectedUser = ref<UserAccessOnlineType | any>({} as UserAccessOnlineType);
 const randomImage = ref<string>("");
-const totalUnreadMessageId = ref<number[]>([])
 const chatOptions = ref<BaseType[]>([]);
 const conversations = ref<any>([]);
 const scrollContainer = ref<any>(null);
+const lastMessageId = ref<number>(0);
 
 const emojis = computed<DataRefType[]>(() => {
   return dataRefStore.data.dataRefs;
@@ -464,7 +455,6 @@ const getConversation = () => {
 
     return {
       ...chat,
-      isUnreadMessage: getTotalUnread(chatMessageWith.map(member => member.user.id)).length > 0,
       me: chat.members.filter((member: Member) => member.user.id == currentUserId.value),
       members: chatMessageWith
     }
@@ -473,6 +463,11 @@ const getConversation = () => {
 
 const messages = computed(() => {
   isDisabledInputMessage.value = chatStore.data.messages.some(s => s?.type?.code == StringConstant.CODE.BLOCK) || false;
+  const otherMessages = chatStore.data.messages?.filter(s => s.sendBy.id !== currentUserId.value) || [];
+  if (otherMessages.length > 0) {
+    const lastIndexElm = otherMessages.length - 1;
+    lastMessageId.value = otherMessages[lastIndexElm].id;
+  }
   isChatHasBlock.value = isDisabledInputMessage.value;
 
   let isHasBlock = isDisabledInputMessage.value;
@@ -514,16 +509,8 @@ const getTotalUnread = (sentMessageByUserId: number[]): number[] => {
   return allMessageId;
 }
 
-const onRequestSeenMessage = () => {
-  console.log(totalUnreadMessageId.value)
-  if (totalUnreadMessageId.value.length > 0) {
-    let total = totalUnreadMessageId.value.length;
-    for (let id = 0; id < total; id++) {
-      setTimeout(async () => {
-        await chatStore.seenMessage(totalUnreadMessageId.value[id], currentUserId.value, chatId.value)
-      }, (id + 1) * 500);
-    }
-  }
+const seenMessage = async () => {
+  await chatStore.seenMessage(lastMessageId.value, currentUserId.value, chatId.value)
 }
 
 const calculateHeight = () => {
@@ -535,10 +522,12 @@ const calculateHeight = () => {
 }
 
 const onSendMessage = () => {
-  if (isCreateChat.value) createChat();
-  else sendNewMessage()
+  if (message.value) {
+    if (isCreateChat.value) createChat();
+    else sendNewMessage()
 
-  message.value = "";
+    message.value = "";
+  }
 }
 
 const createChat = () => {
@@ -633,7 +622,7 @@ const onSelectMessage = (option: BaseType, messageId: number) => {
 
 }
 
-const onSelectedChated = (chat: any, isSeenMessage: boolean) => {
+const onSelectedChated = (chat: any) => {
   message.value = "";
   isCreateChat.value = false
   chatId.value = chat.id;
@@ -642,12 +631,6 @@ const onSelectedChated = (chat: any, isSeenMessage: boolean) => {
   //********* clear unread ******** */
   chatInfo.unread = 0;
   isSelectNewAfterBlock.value = false;
-
-  if (isSeenMessage) {
-    chat.isUnreadMessage = false;
-    totalUnreadMessageId.value = getTotalUnread([chatInfo?.user?.id]);
-    onRequestSeenMessage();
-  }
 
   chatStore.getConversationMessage(chatId.value)
   let select: any = {
@@ -661,6 +644,11 @@ const onSelectedChated = (chat: any, isSeenMessage: boolean) => {
   selectedUser.value = { ...select, chatId: chatId.value };
   localStorage.setItem(StringConstant.SELECT_USER, JSON.stringify(selectedUser.value));
   scrollToBottom();
+
+  setTimeout(() => {
+    seenMessage()
+  }, 500)
+
 }
 
 const loadChat = () => {
