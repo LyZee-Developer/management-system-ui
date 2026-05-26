@@ -46,6 +46,11 @@ export const MessageAction: BaseType[] = [
   {
     code: StringConstant.MESSAGE_ACTION.UNSEND,
     name: "unsend",
+    icon: "material-symbols:unsubscribe-outline-rounded",
+  },
+  {
+    code: StringConstant.ACTION.DELETE,
+    name: "delete",
     icon: "material-symbols:delete-outline-rounded",
   },
 ];

@@ -3,6 +3,7 @@ export const StringConstant = {
   LIGHT: "light",
   DARK: "dark",
   THEME: "theme",
+  
   VUEUSE_COLOR_SCHEME: "vueuse-color-scheme",
   SEARCH: "search",
   ZOOM: "zoom",
@@ -49,6 +50,7 @@ export const StringConstant = {
   CODE: {
     EMOJI: "EMOJI",
     CLEAR : "CLEAR",
-    BLOCK : "BLOCK"
+    BLOCK : "BLOCK",
+    WRITING: "WRITING",
   },
 };

@@ -32,6 +32,7 @@ export const useChatStore = defineStore("chatStore", () => {
     chatId: number,
     senderId: number,
     content: string,
+    type?: string,
     fn?: () => void,
   ) => {
     const res: any = await api.https({
@@ -40,6 +41,7 @@ export const useChatStore = defineStore("chatStore", () => {
         id: chatId,
         sendBy: senderId,
         content: content,
+        type: type,
       },
       method: StringConstant.POST,
     });
@@ -109,6 +111,15 @@ export const useChatStore = defineStore("chatStore", () => {
     fn?.();
   };
 
+  const removeMessage = async (messageId: number, fn?: () => void) => {
+    await api.https({
+      url: `${RouteApi.chat.removeMessage}/${messageId}`,
+      data: {},
+      method: StringConstant.GET,
+    });
+    fn?.();
+  };
+
   const deleteChat = async (chatId: number, fn?: () => void) => {
     await api.https({
       url: `${RouteApi.chat.deleteChat}/${chatId}`,
@@ -138,12 +149,23 @@ export const useChatStore = defineStore("chatStore", () => {
     fn?.();
   };
 
+  const loadingTyping = async (
+    userId: number,
+    chatId: number
+  ) => {
+    const res: any = await api.https({
+      url: `${RouteApi.chat.focusOutMessage}?userId=${userId}&chatId=${chatId}`,
+      data: {},
+      method: StringConstant.GET,
+    });
+    console.log("message", res?.data);
+  };
+
   const removeAllMessage = async (
     chatId: number,
     clearById: number,
     fn?: () => void,
   ) => {
-    console.log("seen");
     const res: any = await api.https({
       url: `${RouteApi.chat.clearMessage}`,
       data: {
@@ -152,7 +174,6 @@ export const useChatStore = defineStore("chatStore", () => {
       },
       method: StringConstant.POST,
     });
-    console.log("message", res?.data);
     fn?.();
   };
 
@@ -188,6 +209,8 @@ export const useChatStore = defineStore("chatStore", () => {
     blockMessage,
     startChat,
     seenMessage,
+    removeMessage,
+    loadingTyping,
     deleteChat,
     deleteMessage,
     removeAllMessage,

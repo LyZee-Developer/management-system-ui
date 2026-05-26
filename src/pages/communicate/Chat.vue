@@ -188,20 +188,22 @@
                       </BDropdown>
                     </div>
                   </div>
-                  <BTooltip>
+                  <BTooltip v-if="message.type?.code !== StringConstant.CODE.WRITING">
                     <template #target>
                       <div
                         class="bg-secondary-subtle d-flex flex-column position-relative align-items-end px-3 py-2 rounded-3"
                         :class="message.reactMessages.length > 0 ? ` margin-bottom ` : ``" v-if="!message.delete">
-                        <p class="m-0 p-0">{{
-                          message.content
-                        }}</p>
-                        <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
-                          moment(message.sendDate).format('LT') }}</p>
-                        <div class="d-flex gap-1 position-absolute" style="right: 10px; bottom: -13px;">
-                          <div class="bg-primary-subtle p-1 rounded-circle" style="font-size: 12px;"
-                            v-for="emoji in message.reactMessages">
-                            {{ emoji?.reactCode?.description }}
+                        <div >
+                          <p class="m-0 p-0">{{
+                            message.content
+                            }}</p>
+                          <p style="font-size: 12px;" class="m-0 text-secondary-emphasis">{{
+                            moment(message.sendDate).format('LT') }}</p>
+                          <div class="d-flex gap-1 position-absolute" style="right: 10px; bottom: -13px;">
+                            <div class="bg-primary-subtle p-1 rounded-circle" style="font-size: 12px;"
+                              v-for="emoji in message.reactMessages">
+                              {{ emoji?.reactCode?.description }}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -232,7 +234,7 @@
               <div class="d-flex gap-2 hover-action align-items-end"
                 v-else-if="message.sendBy.id !== currentUserId && ![StringConstant.CODE.CLEAR, StringConstant.CODE.BLOCK].includes(message.type?.code)">
                 <div class="d-flex gap-2 align-items-end">
-                  <BAvatar size="38" v-if="checkIsShowAvatar(messages, index)"
+                  <BAvatar size="38" v-if="isLastMessage(messages, index)"
                     :style="{ 'background-color': `${selectedUser.colorName} !important` }">
                     {{ selectedUser.username?.slice(0, 1) }}
                   </BAvatar>
@@ -241,7 +243,8 @@
                   <BTooltip>
                     <template #target>
                       <div v-if="!message.delete">
-                        <div class="bg-secondary-subtle position-relative  px-3 py-2 rounded-3"
+                        <div v-if="message.type?.code !== StringConstant.CODE.WRITING"
+                          class="bg-secondary-subtle position-relative  px-3 py-2 rounded-3"
                           :class="message.reactMessages.length > 0 ? ` margin-bottom ` : ``">
                           <p class="m-0 p-0">{{
                             message.content
@@ -255,6 +258,7 @@
                             </div>
                           </div>
                         </div>
+                        <Icon v-else icon="eos-icons:three-dots-loading" width="50" />
 
                       </div>
                       <div v-else class="px-3 py-2 rounded-3" style="background-color: #95959512;">
@@ -319,8 +323,8 @@
               <BCol lg="12" md="12" sm="12" cols="12">
                 <BInputGroup>
                   <BFormTextarea v-model="message" :disabled="isDisabledInputMessage" @keyup.enter="onSendMessage"
-                    @focus="seenMessage" class="rounded-start-5 padding-textarea" size="sm" rows="1" max-rows="1"
-                    placeholder="Say something you here..." />
+                    @blur="onFocusOut" @focus="seenMessage" class="rounded-start-5 padding-textarea" size="sm" rows="1"
+                    max-rows="1" placeholder="Say something you here..." />
                   <BInputGroupText class="rounded-end-5 bg-primary text-white" @click="onSendMessage">
                     <Icon icon="ri:send-ins-line" width="24" height="24" /><span class="ms-2">Send</span>
                   </BInputGroupText>
@@ -480,7 +484,7 @@ const getOptions = (isHasBlock: boolean) => {
   chatOptions.value = getChatOption(isHasBlock);
 }
 
-const checkIsShowAvatar = (messages: MessageType[], index: number): boolean => {
+const isLastMessage = (messages: MessageType[], index: number): boolean => {
   let theSameTop = messages[index - 1]?.sendBy?.id === messages[index]?.sendBy?.id;
   let differenceBottom = messages[index + 1]?.sendBy?.id !== messages[index]?.sendBy?.id;
 
@@ -502,15 +506,14 @@ const onReactEmoji = (emojiCode: string, messageId: number) => {
 
 }
 
-const getTotalUnread = (sentMessageByUserId: number[]): number[] => {
-  console.log("Yes", messages.value)
-  const clientMessage = messages.value.filter(msg => msg.seenMessages.length == 0 && sentMessageByUserId.includes(msg.sendBy.id)) || [];
-  const allMessageId = clientMessage?.map(val => val.id) || [];
-  return allMessageId;
-}
-
 const seenMessage = async () => {
   await chatStore.seenMessage(lastMessageId.value, currentUserId.value, chatId.value)
+}
+
+const onFocusOut = () => {
+  if(message.value.length == 0){
+    chatStore.loadingTyping(currentUserId.value, chatId.value);
+  }
 }
 
 const calculateHeight = () => {
@@ -524,7 +527,7 @@ const calculateHeight = () => {
 const onSendMessage = () => {
   if (message.value) {
     if (isCreateChat.value) createChat();
-    else sendNewMessage()
+    else sendNewMessage("")
 
     message.value = "";
   }
@@ -537,8 +540,8 @@ const createChat = () => {
   })
 }
 
-const sendNewMessage = () => {
-  chatStore.sendMessage(chatId.value, currentUserId.value, message.value)
+const sendNewMessage = (type: string) => {
+  chatStore.sendMessage(chatId.value, currentUserId.value, message.value, type)
 }
 
 onMounted(() => {
@@ -610,15 +613,19 @@ const optionDeleteMessage = (option: BaseType) => {
 }
 
 const onSelectMessage = (option: BaseType, messageId: number) => {
-  if (option.code == StringConstant.MESSAGE_ACTION.UNSEND) {
-    swal.show({
-      confirm: () => {
-        chatStore.deleteMessage(messageId, () => {
-          chatStore.getConversationMessage(chatId.value);
-        })
+  swal.show({
+    confirm: () => {
+      /**************unsend message */
+      if (option.code == StringConstant.MESSAGE_ACTION.UNSEND) {
+        chatStore.deleteMessage(messageId)
       }
-    })
-  }
+      /**************delete message */
+      else {
+        chatStore.removeMessage(messageId)
+      }
+
+    }
+  })
 
 }
 
@@ -641,13 +648,10 @@ const onSelectedChated = (chat: any) => {
     lastSeenMessageId: chatInfo?.lastSeenMessageId,
   }
 
+
   selectedUser.value = { ...select, chatId: chatId.value };
   localStorage.setItem(StringConstant.SELECT_USER, JSON.stringify(selectedUser.value));
   scrollToBottom();
-
-  setTimeout(() => {
-    seenMessage()
-  }, 500)
 
 }
 

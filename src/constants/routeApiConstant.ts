@@ -10,9 +10,11 @@ export const RouteApi = {
     deleteChat: "api/chat/delete",
 
     clearMessage: "api/chat_message/clear",
+    focusOutMessage: "api/chat/un_typing",
 
     //message
     deleteMessage: "api/chat_message/delete",
+    removeMessage: "api/chat_message/remove",
   },
   dataRef: {
     list: "api/data_ref",
