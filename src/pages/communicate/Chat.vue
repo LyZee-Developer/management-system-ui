@@ -323,7 +323,7 @@
               <BCol lg="12" md="12" sm="12" cols="12">
                 <BInputGroup>
                   <BFormTextarea v-model="message" :disabled="isDisabledInputMessage" @keyup.enter="onSendMessage"
-                    @blur="onFocusOut" @focus="seenMessage" class="rounded-start-5 padding-textarea" size="sm" rows="1"
+                     @focus="seenMessage" @input="onInput" class="rounded-start-5 padding-textarea" size="sm" rows="1"
                     max-rows="1" placeholder="Say something you here..." />
                   <BInputGroupText class="rounded-end-5 bg-primary text-white" @click="onSendMessage">
                     <Icon icon="ri:send-ins-line" width="24" height="24" /><span class="ms-2">Send</span>
@@ -506,13 +506,14 @@ const onReactEmoji = (emojiCode: string, messageId: number) => {
 
 }
 
-const seenMessage = async () => {
-  await chatStore.seenMessage(lastMessageId.value, currentUserId.value, chatId.value)
+const onInput = (e:any) =>{
+    const value = e.target.value;
+    chatStore.loadingTyping(currentUserId.value, chatId.value,value.length > 0);
 }
 
-const onFocusOut = () => {
-  if(message.value.length == 0){
-    chatStore.loadingTyping(currentUserId.value, chatId.value);
+const seenMessage = async () => {
+  if(chatId.value > 0 && lastMessageId.value > 0){
+    await chatStore.seenMessage(lastMessageId.value, currentUserId.value, chatId.value)
   }
 }
 

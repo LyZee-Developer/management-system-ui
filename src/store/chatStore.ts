@@ -151,10 +151,11 @@ export const useChatStore = defineStore("chatStore", () => {
 
   const loadingTyping = async (
     userId: number,
-    chatId: number
+    chatId: number,
+    isTyping: boolean,
   ) => {
     const res: any = await api.https({
-      url: `${RouteApi.chat.focusOutMessage}?userId=${userId}&chatId=${chatId}`,
+      url: `${RouteApi.chat.focusOutMessage}?userId=${userId}&chatId=${chatId}&isTyping=${isTyping}`,
       data: {},
       method: StringConstant.GET,
     });
