@@ -1,7 +1,9 @@
 <template>
     <b-container fluid class="p-0">
-        <Header v-if="isShowHeader"/>
-        <router-view />
+        <Header v-if="isShowHeader" />
+        <div class="section-height-message">
+            <router-view />
+        </div>
     </b-container>
 </template>
 
@@ -33,3 +35,8 @@ onMounted(() => {
 
 
 </script>
+<style lang="scss" scoped>
+.section-height-message {
+    height: calc(100vh - 150px);
+}
+</style>

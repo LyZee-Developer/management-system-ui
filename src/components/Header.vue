@@ -22,9 +22,6 @@
               {{ $t("header.management_all_system") }}
             </BTooltip>
           </BCol>
-          <!-- <BCol sm="4" md="4" :class="style.flex_center" class="text-white fs-6 text-center">
-            {{ time }}
-          </BCol> -->
           <BCol sm="6" md="6" :class="style.flex_end" class="text-white gap-3">
             <BTooltip>
               <template #target>
@@ -79,7 +76,6 @@
         <BBreadcrumb :items="breadcrumbItems" ol-class="m-0" />
       </div>
     </div>
-
   </BContainer>
 </template>
 
@@ -105,6 +101,7 @@ import type { BaseType } from '../types/baseType';
 import { useUserInfoStore } from '../store/UserInfoStrore';
 import type { UserInfo } from '../types/Register/RegisterType';
 import { ApiUtil } from '../utils/HttpUtil';
+import { useI18n } from 'vue-i18n';
 
 const route = RouteUtil();
 const headerStore = useHeaderStore();
@@ -112,18 +109,23 @@ const lang = LanguageUtil();
 const theme = ThemeUtil();
 const useInfoStore = useUserInfoStore();
 const api = ApiUtil();
+const { t } = useI18n()
 
 const DURATION = 1000;
 const time = ref<string>();
 const selectLanguage = ref<LanguageType>({} as LanguageType);
 const isDarkReactive = computed(() => useDark());
 const userInfo = computed<UserInfo>(() => useInfoStore.data.info);
-const isShowBreadcrumb = computed(() => headerStore.data.isShowBreadcrumb ?? false);
+const isShowBreadcrumb = computed(() => {
+  let paths = route.getPathList();
+  let isShow = headerStore.data.isShowBreadcrumb || paths.length > 0;
+  return isShow;
+});
 
 
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   let paths = route.getPathList() ?? [];
-  let breadcrumbs = paths.map((path) => ({ text: path }));
+  let breadcrumbs = paths.map((path) => ({ text: t('system.' + path.toLowerCase()) }));
   let items = isShowBreadcrumb.value ? breadcrumbs : [];
   return items;
 })
@@ -155,7 +157,9 @@ const onSetting = (value: BaseType) => {
       requestLogout(url);
       route.setNewRoute(url);
       break;
-    case StringConstant.PROFILE: url = "profile"
+    case StringConstant.ACCOUNT_SETTING: url = StringConstant.ACCOUNT_SETTING.toLocaleLowerCase();
+      route.setNewRoute(url);
+      headerStore.setIsShowBreadcrumb(true);
       break;
   }
   // change to other page

@@ -3,8 +3,8 @@ import { StringConstant } from "./stringConstant";
 
 export const SettingConstant: BaseType[] = [
   {
-    code: StringConstant.PROFILE,
-    name: "Profile",
+    code: StringConstant.ACCOUNT_SETTING,
+    name: "Account_setting",
     icon: "proicons:person-circle",
   },
   {

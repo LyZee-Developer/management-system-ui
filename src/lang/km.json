@@ -54,6 +54,9 @@
     "block": "ទប់ស្កាត់",
     "unsend": "មិនផ្ញើ",
     "delete": "លុប",
-    "clear": "សំអាត"
+    "clear": "សំអាត",
+    "account": "គណនី",
+    "account_settings": "ការកំណត់គណនី",
+    "chat": "ជជែក"
   }
 }

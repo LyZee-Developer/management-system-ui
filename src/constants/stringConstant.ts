@@ -29,6 +29,8 @@ export const StringConstant = {
 
   CHATID: "chatId",
   SELECT_USER: "selectUser",
+  ACCOUNT: "Account",
+  ACCOUNT_SETTING: "account_settings",
   BLOCK: "block",
   CLEAR_CHAT: "clear_chat",
 

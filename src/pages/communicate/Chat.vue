@@ -1,5 +1,5 @@
 <template>
-  <BContainer fluid class="section-height-message">
+  <BContainer fluid class="h-100">
     <div class="h-100  grid-middle">
       <!-- // list of users we will be to chat with -->
       <div lg="2" md="4" sm="5" class="h-100 pb-3 overflow-y-auto">
@@ -508,11 +508,13 @@ const onReactEmoji = (emojiCode: string, messageId: number) => {
 
 const onInput = (e:any) =>{
     const value = e.target.value;
-    chatStore.loadingTyping(currentUserId.value, chatId.value,value.length > 0);
+    if(!isCreateChat.value && chatId.value > 0){
+      chatStore.loadingTyping(currentUserId.value, chatId.value,value.length > 0);
+    }
 }
 
 const seenMessage = async () => {
-  if(chatId.value > 0 && lastMessageId.value > 0){
+  if(chatId.value > 0 && lastMessageId.value > 0 && !isCreateChat.value){
     await chatStore.seenMessage(lastMessageId.value, currentUserId.value, chatId.value)
   }
 }
@@ -704,9 +706,6 @@ onMounted(() => {
   height: calc(100vh - 317px);
 }
 
-.section-height-message {
-  height: calc(100vh - 150px);
-}
 
 .margin-bottom {
   margin-bottom: 11px !important;

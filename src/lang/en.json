@@ -55,6 +55,9 @@
     "unSend": "unsend",
     "unsend": "Unsend",
     "delete": "Delete",
-    "clear": "Clear"
+    "clear": "Clear",
+    "account": "Account",
+    "account_settings": "Account Setting",
+    "chat": "Chat"
   }
 }
