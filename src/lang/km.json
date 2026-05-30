@@ -57,6 +57,18 @@
     "clear": "សំអាត",
     "account": "គណនី",
     "account_settings": "ការកំណត់គណនី",
-    "chat": "ជជែក"
+    "chat": "ជជែក",
+    "general": "ទូទៅ",
+    "workspace": "កន្លែងធ្វើការ",
+    "my_profile": "ប្រវត្តិរូបរបស់ខ្ញុំ",
+    "change_photo": "ផ្លាស់ប្តូររូបថត",
+    "remove_photo": "លុបរូបថត",
+    "account_security": "សុវត្ថិភាពគណនី",
+    "change_email": "ផ្លាស់ប្តូរអ៊ីមែល",
+    "change_password": "ផ្លាស់ប្តូរពាក្យសម្ងាត់",
+    "save_changes": "រក្សាទុកការផ្លាស់ប្តូរ",
+    "cancel": "បោះបង់",
+    "save_photo": "រក្សាទុករូបថត",
+    "save_photos": "រក្សាទុករូបថត"
   }
 }

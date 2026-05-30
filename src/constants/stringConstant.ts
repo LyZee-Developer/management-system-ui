@@ -1,3 +1,5 @@
+import type { GenerateUtil } from "../utils/GenerateUtil";
+
 export const StringConstant = {
   // theme
   LIGHT: "light",
@@ -30,7 +32,7 @@ export const StringConstant = {
   CHATID: "chatId",
   SELECT_USER: "selectUser",
   ACCOUNT: "Account",
-  ACCOUNT_SETTING: "account_settings",
+  
   BLOCK: "block",
   CLEAR_CHAT: "clear_chat",
 
@@ -47,6 +49,21 @@ export const StringConstant = {
     CREATE: "create",
     UPDATE: "update",
     CLEAR: "clear",
+  },
+
+  ACCOUNT_SETTING: {
+    _: "account_settings",
+    APP: "App",
+    ACCOUNT: "Account",
+    NOTIFICATION: "Notification",
+    LANGUAGE_AND_REGION: "Language & Region",
+  },
+  
+  WORKSPACE_SETTING: {
+    _: "workspace_settings",
+    GENERAL: "General",
+    MEMBERS: "Members",
+    BILLING: "Billing",
   },
   
   CODE: {

@@ -15,7 +15,7 @@ const routes: Array<any> = [
   { path: "/login", name: "login", component: Login },
 
   //account
-  { path: `/${StringConstant.ACCOUNT_SETTING}`, name: "account-setting", component: AccountSetting },
+  { path: `/${StringConstant.ACCOUNT_SETTING._}`, name: "account-setting", component: AccountSetting },
   
   //sub children of communicate
   { path: "/chat", name: "chat", component: Chat },

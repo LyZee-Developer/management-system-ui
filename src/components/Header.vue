@@ -157,7 +157,7 @@ const onSetting = (value: BaseType) => {
       requestLogout(url);
       route.setNewRoute(url);
       break;
-    case StringConstant.ACCOUNT_SETTING: url = StringConstant.ACCOUNT_SETTING.toLocaleLowerCase();
+    case StringConstant.ACCOUNT_SETTING._: url = StringConstant.ACCOUNT_SETTING._.toLocaleLowerCase();
       route.setNewRoute(url);
       headerStore.setIsShowBreadcrumb(true);
       break;

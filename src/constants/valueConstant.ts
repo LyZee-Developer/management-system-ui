@@ -3,7 +3,7 @@ import { StringConstant } from "./stringConstant";
 
 export const SettingConstant: BaseType[] = [
   {
-    code: StringConstant.ACCOUNT_SETTING,
+    code: StringConstant.ACCOUNT_SETTING._,
     name: "Account_setting",
     icon: "proicons:person-circle",
   },

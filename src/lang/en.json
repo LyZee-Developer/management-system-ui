@@ -58,6 +58,18 @@
     "clear": "Clear",
     "account": "Account",
     "account_settings": "Account Setting",
-    "chat": "Chat"
+    "chat": "Chat",
+    "general": "General",
+    "workspace": "Workspace",
+    "my_profile": "My Profile",
+    "change_photo": "Change Photo",
+    "remove_photo": "Remove Photo",
+    "account_security": "Account Security",
+    "change_email": "Change Email",
+    "change_password": "Change Password",
+    "save_changes": "Save Change",
+    "cancel": "Cancel",
+    "save_photo": "Save Photo",
+    "save_photos": "Save Photo"
   }
 }
